@@ -1,7 +1,6 @@
-﻿namespace ToDo.Domain
-{
-    public class Class1
-    {
+﻿namespace ToDo.Domain;
 
-    }
+public class Class1
+{
+
 }

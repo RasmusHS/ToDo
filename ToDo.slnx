@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ToDo.Domain/ToDo.Domain.csproj" />
+    <Project Path="src/ToDo.Persistence/ToDo.Persistence.csproj" />
+  </Folder>
+</Solution>

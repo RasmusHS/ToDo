@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/ToDo.Domain/ToDo.Domain.csproj" />
     <Project Path="src/ToDo.Persistence/ToDo.Persistence.csproj" />

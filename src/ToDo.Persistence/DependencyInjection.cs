@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,15 +10,15 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        //services.AddDbContext<ToDoDbContext>(options =>
-        //{
-        //    options
-        //        .UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
-        //        .UseSnakeCaseNamingConvention();
-        //});
+        services.AddDbContext<ToDoDbContext>(options =>
+        {
+            options
+                .UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+                .UseSnakeCaseNamingConvention();
+        });
 
-        //services.AddScoped(provider =>
-        //    provider.GetRequiredService<ToDoDbContext>());
+        services.AddScoped(provider =>
+            provider.GetRequiredService<ToDoDbContext>());
 
         return services;
     }

@@ -3,7 +3,14 @@
     <File Path=".editorconfig" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/ToDo.Api/ToDo.Api.csproj" Id="7966230d-d785-4184-8095-a171c104dce0" />
     <Project Path="src/ToDo.Domain/ToDo.Domain.csproj" />
     <Project Path="src/ToDo.Persistence/ToDo.Persistence.csproj" />
+    <Project Path="src/ToDo.Webapp/ToDo.Webapp.csproj" Id="95c459a5-e674-4185-b23f-a318499bdc8d" />
+  </Folder>
+  <Folder Name="/src/Tests/">
+    <Project Path="src/Tests/Helpers/Helpers.csproj" Id="fa3e2db2-ffb1-4753-a9dd-939a36254f6c" />
+    <Project Path="src/Tests/ToDo.Api.IntegrationTests/ToDo.Api.IntegrationTests.csproj" Id="ae5468b9-9e30-4142-b4ec-25feacb8ac62" />
+    <Project Path="src/Tests/ToDo.Domain.Tests/ToDo.Domain.Tests.csproj" Id="8e4106a8-0dea-4a53-854a-810ebe35f392" />
   </Folder>
 </Solution>

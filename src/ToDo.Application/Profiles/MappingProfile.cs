@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
 
-namespace ToDo.Api.Profiles;
+namespace ToDo.Application.Profiles;
 
 public class MappingProfile : Profile
 {

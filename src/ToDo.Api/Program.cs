@@ -1,4 +1,4 @@
-using ToDo.Api.Profiles;
+using ToDo.Application;
 using ToDo.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +12,8 @@ builder.Services.AddOpenApi();
 // open Package Manager Console
 // Add-Migration
 // Name: Initial
+builder.Services.AddApplication();
 builder.Services.AddPersistence(builder.Configuration);
-builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile));
 //builder.Services.AddCors(options =>
 //{
 //    options.AddPolicy("AllowBlazorClient", policy =>

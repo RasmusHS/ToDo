@@ -17,9 +17,6 @@ public static class DependencyInjection
                 .UseSnakeCaseNamingConvention();
         });
 
-        services.AddScoped(provider =>
-            provider.GetRequiredService<ToDoDbContext>());
-
         return services;
     }
 }

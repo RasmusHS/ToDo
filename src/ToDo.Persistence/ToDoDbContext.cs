@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ToDo.Domain;
 
 namespace ToDo.Persistence;
 
@@ -8,7 +9,8 @@ public class ToDoDbContext : DbContext
     { 
     }
 
-    //public DbSet<>  { get; set; }
+    public DbSet<ToDoListEntity> ToDoLists { get; set; }
+    public DbSet<ToDoItemEntity> ToDoItems { get; set; }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

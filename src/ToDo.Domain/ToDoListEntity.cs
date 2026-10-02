@@ -33,11 +33,11 @@ public sealed class ToDoListEntity
     /// </summary>
     /// <param name="listTitle"></param>
     /// <param name="listDescription"></param>
-    /// <exception cref="NotImplementedException"></exception>
     public void Update(string listTitle, string? listDescription)
     {
-        throw new NotImplementedException();
-        //ModifiedOn = DateTime.UtcNow;
+        ListTitle = listTitle;
+        ListDescription = listDescription;
+        ModifiedOn = DateTime.UtcNow;
     }
 
     // ---Private Methods---

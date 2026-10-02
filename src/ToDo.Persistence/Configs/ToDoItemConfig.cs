@@ -4,21 +4,20 @@ using ToDo.Domain;
 
 namespace ToDo.Persistence.Configs;
 
-public class ToDoListConfig : IEntityTypeConfiguration<ToDoListEntity>
+public class ToDoItemConfig : IEntityTypeConfiguration<ToDoItemEntity>
 {
-    public void Configure(EntityTypeBuilder<ToDoListEntity> builder)
+    public void Configure(EntityTypeBuilder<ToDoItemEntity> builder)
     {
         // Configure keys
         builder.HasKey(x => x.Id); // Primary key
 
-        builder.HasIndex(x => x.ListTitle).IsUnique(); // Unique index on ListTitle
-        builder.Property(x => x.ListTitle).IsRequired().HasMaxLength(200);
-        builder.Property(x => x.ListDescription).HasMaxLength(500);
+        builder.Property(x => x.Text).IsRequired().HasMaxLength(500);
+        builder.Property(x => x.Status).HasMaxLength(100);
         builder.Property(x => x.CreatedOn).IsRequired();
 
         // Configure relationships
-        builder.HasMany(x => x.ToDoItems)
-               .WithOne(x => x.ToDoList)
+        builder.HasOne(x => x.ToDoList)
+               .WithMany(x => x.ToDoItems)
                .HasForeignKey(x => x.ToDoListId)
                .OnDelete(DeleteBehavior.Cascade);
 

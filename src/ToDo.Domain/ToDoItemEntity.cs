@@ -37,11 +37,12 @@ public sealed class ToDoItemEntity
     /// <param name="isDone"></param>
     /// <param name="text"></param>
     /// <param name="status"></param>
-    /// <exception cref="NotImplementedException"></exception>
     public void Update(bool isDone, string text, string? status)
     {
-        throw new NotImplementedException();
-        //ModifiedOn = DateTime.UtcNow;
+        IsDone = isDone;
+        Text = text;
+        Status = status;
+        ModifiedOn = DateTime.UtcNow;
     }
 
     // ---Private Methods---

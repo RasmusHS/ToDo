@@ -1,13 +1,22 @@
-using FluentValidation;
-
 namespace ToDo.Application.DTO.Commands.ToDoItem;
 
-public class CreateToDoItemDto
+public class ToDoItemResponseDto
 {
+    /// <summary>
+    /// Unique PK identifier for each ToDoItemEntity.
+    /// </summary>
+    public Guid Id { get; set; }
+
     // <summary>
     /// FK identifier for which ToDoListEntity that this ToDoItemEntity belongs to.
     /// </summary>
     public Guid ToDoListId { get; set; }
+
+    /// <summary>
+    /// Indicates whether this ToDoItemEntity is done.
+    /// Default is set to false in the ctor
+    /// </summary>
+    public bool IsDone { get; set; }
 
     /// <summary>
     /// The text of a ToDoItemEntity that tells what this item is about, like "Touch grass".
@@ -21,15 +30,15 @@ public class CreateToDoItemDto
     /// </summary>
     public string? Status { get; set; }
 
-    public class Validator : AbstractValidator<CreateToDoItemDto>
-    {
-        public Validator()
-        {
-            RuleFor(x => x.ToDoListId).NotEmpty().WithMessage("ToDoListId is required.");
-            RuleFor(x => x.Text)
-                .NotEmpty().WithMessage("Text is required.")
-                .MaximumLength(500).WithMessage("Text cannot exceed 500 characters.");
-            RuleFor(x => x.Status).MaximumLength(100).WithMessage("Status cannot exceed 100 characters.");
-        }
-    }
+    /// <summary>
+    /// The date and time on which a ToDoItemEntity was created. 
+    /// Only set at creation and then never touched again.
+    /// </summary>
+    public DateTime CreatedOn { get; set; }
+
+    /// <summary>
+    /// The date and time on which a ToDoItemEntity was last updated.
+    /// Only set in ctor and Update methods.
+    /// </summary>
+    public DateTime ModifiedOn { get; set; }
 }

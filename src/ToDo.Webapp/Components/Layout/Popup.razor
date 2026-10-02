@@ -1,0 +1,57 @@
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="toast-container p-3 @showClass" data-bs-autohide="true" data-bs-delay="5000">
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">@HeaderText</strong>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
+        <div class="toast-body">
+            <input type="text" @onkeydown="@Enter" @bind="newToDo" />
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public required string newToDo {get; set;}
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    public void Show()
+    {
+        Console.WriteLine($"Call Show");
+        HeaderText = "Insert To-Do text";
+        IsVisible = true;
+        StateHasChanged();
+    }
+    public void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            if (!string.IsNullOrWhiteSpace(newToDo))
+            {
+                
+                Console.WriteLine($"Created TODO Item {newToDo}");
+            }
+            Close();
+        }
+        
+    }
+    private void Close()
+    {
+        HeaderText = string.Empty;
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Testcontainers.PostgreSql;
 using ToDo.Persistence;
@@ -12,7 +14,7 @@ namespace ToDo.Api.IntegrationTests;
 
 public class ToDoWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:latest")
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:18")
         .WithName($"todo.db{Guid.NewGuid():N}")
         .WithDatabase("todo")
         .WithUsername("sa")
@@ -36,12 +38,13 @@ public class ToDoWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             if (descriptor != null)
             {
                 services.Remove(descriptor);
+                services.RemoveAll<IDbContextOptionsConfiguration<ToDoDbContext>>();
             }
 
             services.AddDbContext<ToDoDbContext>(options =>
             {
                 options
-                    .UseNpgsql(_dbContainer.GetConnectionString())//+ ";DefaultConnection=todo.db"
+                    .UseNpgsql(_dbContainer.GetConnectionString())
                     .UseSnakeCaseNamingConvention()
                     .ConfigureWarnings(warnings =>
                         warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
@@ -74,10 +77,9 @@ public class ToDoWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
         return _dbContainer.StartAsync();
     }
 
-    public new Task DisposeAsync() => Task.CompletedTask;
-
-    //Task IAsyncLifetime.DisposeAsync()
-    //{
-    //    throw new NotImplementedException();
-    //}
+    public new async Task DisposeAsync()
+    {
+        await _dbContainer.DisposeAsync();
+        await base.DisposeAsync();
+    }
 }

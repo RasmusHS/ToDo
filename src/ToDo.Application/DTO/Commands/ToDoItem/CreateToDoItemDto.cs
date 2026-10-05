@@ -1,0 +1,35 @@
+using FluentValidation;
+
+namespace ToDo.Application.DTO.Commands.ToDoItem;
+
+public class CreateToDoItemDto
+{
+    // <summary>
+    /// FK identifier for which ToDoListEntity that this ToDoItemEntity belongs to.
+    /// </summary>
+    public Guid ToDoListId { get; set; }
+
+    /// <summary>
+    /// The text of a ToDoItemEntity that tells what this item is about, like "Touch grass".
+    /// </summary>
+    public string Text { get; set; }
+
+    /// <summary>
+    /// A status for a given ToDoItemEntity.
+    /// Set as nullable as not all items have any need for a status, like simple groceries where "IsDone" is enough.
+    /// Shortterm the values will be taken from a list here in the domain, but a better solution would be a json file.  
+    /// </summary>
+    public string? Status { get; set; }
+
+    public class Validator : AbstractValidator<CreateToDoItemDto>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ToDoListId).NotEmpty().WithMessage("ToDoListId is required.");
+            RuleFor(x => x.Text)
+                .NotEmpty().WithMessage("Text is required.")
+                .MaximumLength(500).WithMessage("Text cannot exceed 500 characters.");
+            RuleFor(x => x.Status).MaximumLength(100).WithMessage("Status cannot exceed 100 characters.");
+        }
+    }
+}

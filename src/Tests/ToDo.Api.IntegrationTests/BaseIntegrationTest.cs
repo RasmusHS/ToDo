@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ToDo.Persistence;
 
@@ -8,14 +9,12 @@ public abstract class BaseIntegrationTest : IClassFixture<ToDoWebApplicationFact
 {
     private readonly IServiceScope _scope;
     private readonly ToDoWebApplicationFactory _factory;
-    //protected readonly ISender Sender;
     protected readonly ToDoDbContext DbContext;
 
     protected BaseIntegrationTest(ToDoWebApplicationFactory factory)
     {
         _factory = factory;
         _scope = factory.Services.CreateScope();
-        //Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
         DbContext = _scope.ServiceProvider.GetRequiredService<ToDoDbContext>();
         InitializeDatabaseAsync().GetAwaiter().GetResult();
     }
@@ -32,7 +31,8 @@ public abstract class BaseIntegrationTest : IClassFixture<ToDoWebApplicationFact
     private async Task CleanDatabaseAsync()
     {
         // Remove all data from tables
-        //DbContext.Projects.RemoveRange(DbContext.Projects);
+        //DbContext.ToDoLists.RemoveRange(DbContext.ToDoLists);
+        await DbContext.ToDoLists.ExecuteDeleteAsync();
 
         await DbContext.SaveChangesAsync();
     }

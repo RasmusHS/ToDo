@@ -1,5 +1,4 @@
 using FluentValidation;
-using ToDo.Domain;
 
 namespace ToDo.Application.DTO.Commands.ToDoList;
 
@@ -19,7 +18,7 @@ public class CreateToDoListDto
     /// <summary>
     /// Navigation property to help EF map the relationship and to access associated ToDoItemEntities.
     /// </summary>
-    public List<ToDoItemEntity> ToDoItems { get; set; }
+    //public List<CreateToDoItemDto>? ToDoItems { get; set; }
 
     public class Validator : AbstractValidator<CreateToDoListDto>
     {

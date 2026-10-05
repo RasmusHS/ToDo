@@ -1,4 +1,4 @@
-using ToDo.Domain;
+using ToDo.Application.DTO.Commands.ToDoItem;
 
 namespace ToDo.Application.DTO.Commands.ToDoList;
 
@@ -35,5 +35,5 @@ public class ToDoListResponseDto
     /// <summary>
     /// Navigation property to help EF map the relationship and to access associated ToDoItemEntities.
     /// </summary>
-    public List<ToDoItemEntity> ToDoItems { get; set; }
+    //public List<ToDoItemResponseDto>? ToDoItems { get; set; }
 }

@@ -27,10 +27,9 @@ public class CreateToDoListCommandHandler : ICreateToDoListCommand
         {
             if (_dbContext.ToDoLists.Any(t => t.ListTitle == dto.ListTitle))
             {
-                errors.Add(ToDoListErrors.AlreadyExists<ToDoListResponseDto>());
+                errors.Add(ToDoListErrors.AlreadyExists<CreateToDoListDto>(dto.ListTitle));
                 return errors; // Return the list of errors if a ToDoList with the same title already exists
-            }
-                
+            }   
 
             var toDoListEntity = _mapper.Map<ToDoListEntity>(dto);
 

@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Diagnostics.CodeAnalysis
+
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -42,11 +43,13 @@ else
 @code {
     private List<ToDoItem> todoItems = [];
     private Popup popupRef;
-    private void OpenToDoPopup()
+    private async Task OpenToDoPopup()
     {
         popupRef.Show();
+        //string toDoToCreate;
+        //toDoToCreate = await popupRef.returnNewToDo();
     }
-    private void CreateToDo(string nameText)
+    public void CreateToDo(string nameText)
     {
         todoItems.Add( new ToDoItem(nameText));
         Console.WriteLine($"Created TODO Item {nameText}");
@@ -65,6 +68,7 @@ else
             ModifiedOn = DateTime.Now;
         }
     }
+    
 
     [Parameter]
     public bool IsChecked { get; set; } = true;

@@ -1,5 +1,3 @@
-using ToDo.Application.DTO.Commands.ToDoItem;
-
 namespace ToDo.Application.DTO.Commands.ToDoList;
 
 public class ToDoListResponseDto
@@ -31,9 +29,4 @@ public class ToDoListResponseDto
     /// Only set in ctor and Update methods.
     /// </summary>
     public DateTime ModifiedOn { get; set; }
-
-    /// <summary>
-    /// Navigation property to help EF map the relationship and to access associated ToDoItemEntities.
-    /// </summary>
-    //public List<ToDoItemResponseDto>? ToDoItems { get; set; }
 }

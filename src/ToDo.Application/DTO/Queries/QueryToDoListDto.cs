@@ -1,5 +1,3 @@
-using ToDo.Domain;
-
 namespace ToDo.Application.DTO.Queries;
 
 public class QueryToDoListDto
@@ -35,5 +33,5 @@ public class QueryToDoListDto
     /// <summary>
     /// Navigation property to help EF map the relationship and to access associated ToDoItemEntities.
     /// </summary>
-    public List<ToDoItemEntity> ToDoItems { get; set; }
+    public List<QueryToDoItemDto>? ToDoItems { get; set; }
 }

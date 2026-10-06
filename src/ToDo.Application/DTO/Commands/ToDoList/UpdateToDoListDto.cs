@@ -32,11 +32,6 @@ public class UpdateToDoListDto
     /// </summary>
     public DateTime ModifiedOn { get; set; }
 
-    /// <summary>
-    /// Navigation property to help EF map the relationship and to access associated ToDoItemEntities.
-    /// </summary>
-    //public List<UpdateToDoItemDto>? ToDoItems { get; set; }
-
     public class Validator : AbstractValidator<UpdateToDoListDto>
     {
         public Validator()

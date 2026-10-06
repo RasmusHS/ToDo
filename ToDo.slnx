@@ -1,6 +1,8 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path=".github/workflow/Pr.yml" />
+    <File Path="docker-compose.yml" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ToDo.Api/ToDo.Api.csproj" Id="7966230d-d785-4184-8095-a171c104dce0" />

@@ -4,7 +4,7 @@ namespace ToDo.Application.Errors;
 
 public static class ToDoListErrors
 {
-    public static ErrorResponseDto NotFound<T>() => new ErrorResponseDto("entity.not.found", $"{typeof(T).Name} not found.");
+    public static ErrorResponseDto NotFound<T>(Guid id) => new ErrorResponseDto("entity.not.found", $"{typeof(T).Name} with ID {id} not found.");
 
     // Create errors 
     public static ErrorResponseDto AlreadyExists<T>(string identifier) => new ErrorResponseDto("entity.already.exists", $"{typeof(T).Name} '{identifier}' already exists.");

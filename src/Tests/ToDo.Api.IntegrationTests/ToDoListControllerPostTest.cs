@@ -8,7 +8,7 @@ using ToDo.Domain;
 
 namespace ToDo.Api.IntegrationTests;
 
-public class ToDoListControllerTest : BaseIntegrationTest
+public class ToDoListControllerPostTest : BaseIntegrationTest
 {
     private const string PostUrl = "api/ToDoList/postToDoList";
 
@@ -18,7 +18,7 @@ public class ToDoListControllerTest : BaseIntegrationTest
 
     private readonly HttpClient _client;
 
-    public ToDoListControllerTest(ToDoWebApplicationFactory factory) : base(factory)
+    public ToDoListControllerPostTest(ToDoWebApplicationFactory factory) : base(factory)
     {
         _client = factory.CreateClient();
     }

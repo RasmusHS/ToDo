@@ -9,19 +9,20 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./.containers/db:/var/lib/postgresql/data
+      - ./.containers/db:/var/lib/postgresql
 
   todo.api:
     ports:
-      - "5295:80"
-      #- "7156:443"
+      - "5295:8080"
+      #- "7156:8081"
     image: ${DOCKER_REGISTRY-}todoapi
     build:
       context: .
-      dockerfile: ./ToDo.Api/Dockerfile
+      dockerfile: ./src/ToDo.Api/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT= Development
+      - ASPNETCORE_ENVIRONMENT=Development
       #- "ASPNETCORE_URLS": "https://+:7156;http://+:5295"
+      - ASPNETCORE_URL=http://localhost
       - ASPNETCORE_HTTP_PORT= 5295
       #- "ASPNETCORE_Kestrel__Certificates__Default__Password": ""
       #- "ASPNETCORE_Kestrel__Certificates__Default__Path": "/https/aspnetapp.pfx"

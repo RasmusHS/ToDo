@@ -13,11 +13,13 @@ namespace ToDo.Api.Controllers;
 public class ToDoListController : ControllerBase
 {
     private readonly ICreateToDoListCommand _createToDoList;
+    private readonly IGetAllToDoListsQuery _getAllToDoLists;
     private readonly IGetToDoListQuery _getToDoList;
 
-    public ToDoListController(ICreateToDoListCommand createToDoList, IGetToDoListQuery getToDoList)
+    public ToDoListController(ICreateToDoListCommand createToDoList, IGetAllToDoListsQuery getAllToDoLists, IGetToDoListQuery getToDoList)
     {
         _createToDoList = createToDoList;
+        _getAllToDoLists = getAllToDoLists;
         _getToDoList = getToDoList;
     }
 
@@ -61,6 +63,18 @@ public class ToDoListController : ControllerBase
             return BadRequest(errors);
 
         var queryResult = await _getToDoList.GetAsync(id);
+
+        if (queryResult.IsT0)
+            return Ok(queryResult.AsT0);
+        else
+            return NotFound(queryResult.AsT1);
+    }
+
+    [HttpGet]
+    [Route("getAllToDoLists")]
+    public async Task<IActionResult> GetAllToDoLists()
+    {
+        var queryResult = await _getAllToDoLists.GetAllAsync();
 
         if (queryResult.IsT0)
             return Ok(queryResult.AsT0);

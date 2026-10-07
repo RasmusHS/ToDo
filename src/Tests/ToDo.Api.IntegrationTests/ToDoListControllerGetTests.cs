@@ -152,4 +152,79 @@ public class ToDoListControllerGetTests : BaseIntegrationTest
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    // ===GetAllToDoLists===
+
+    private const string GetAllUrl = "api/ToDoList/getAllToDoLists";
+
+    private async Task<List<QueryToDoListDto>?> GetAllAsync() =>
+        await (await _client.GetAsync(GetAllUrl)).Content.ReadFromJsonAsync<List<QueryToDoListDto>>();
+
+    // ---Lists exist---
+
+    [Fact]
+    public async Task GetAllToDoLists_ListsExist_Returns200()
+    {
+        await SeedListAsync();
+
+        var response = await _client.GetAsync(GetAllUrl);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    /// <summary>
+    /// No ORDER BY in the query, so compare as sets.
+    /// </summary>
+    [Fact]
+    public async Task GetAllToDoLists_ListsExist_ReturnsEveryList()
+    {
+        var seeded = new[] { await SeedListAsync(), await SeedListAsync(), await SeedListAsync() };
+
+        var body = await GetAllAsync();
+
+        Assert.NotNull(body);
+        Assert.Equal(3, body.Count);
+        Assert.True(seeded.Select(l => l.Id).ToHashSet().SetEquals(body.Select(l => l.Id)));
+    }
+
+    [Fact]
+    public async Task GetAllToDoLists_ListsExist_ReturnsStoredValues()
+    {
+        var list = await SeedListAsync();
+        var saved = await DbContext.ToDoLists.AsNoTracking().SingleAsync(l => l.Id == list.Id);
+
+        var dto = Assert.Single((await GetAllAsync())!);
+
+        Assert.Equal(saved.ListTitle, dto.ListTitle);
+        Assert.Equal(saved.ListDescription, dto.ListDescription);
+        Assert.Equal(saved.CreatedOn, dto.CreatedOn);
+        Assert.Equal(saved.ModifiedOn, dto.ModifiedOn);
+    }
+
+    /// <summary>
+    /// Documents current behavior: the query has no Include, so items aren't returned.
+    /// Accepts null or [] so it doesn't depend on mapper/serializer details.
+    /// Flip if the overview starts including items.
+    /// </summary>
+    [Fact]
+    public async Task GetAllToDoLists_ListsWithItems_DoesNotReturnItems()
+    {
+        await SeedListAsync(itemCount: 3);
+
+        var dto = Assert.Single((await GetAllAsync())!);
+
+        Assert.True(dto.ToDoItems is null || dto.ToDoItems.Count == 0);
+    }
+
+    // ---No lists---
+    // Pins current behavior (404 on empty). If empty becomes 200 + [], replace with that assertion.
+
+    [Fact]
+    public async Task GetAllToDoLists_NoLists_Returns404WithCollectionNotFoundError()
+    {
+        var response = await _client.GetAsync(GetAllUrl);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        var errors = await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>();
+        Assert.Equal("entity.collection.not.found", Assert.Single(errors!).ErrorCode);
+    }
 }

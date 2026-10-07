@@ -1,6 +1,6 @@
 ﻿@page "/"
 @using System.Diagnostics.CodeAnalysis
-
+@inject IToDoListService ToDoListService
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -20,7 +20,7 @@
     </div>
 </form>
 
-@if (todoLists == null)
+@if (false)
 {
     <p><em>Loading...</em></p>
 }
@@ -36,7 +36,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var todoList in todoLists)
+            @* @foreach (var todoList in todoLists)
             {
                 <tr>
                     <td><input type="checkbox" @bind-value="@IsChecked" @bind-value:after="CheckboxChanged"></td>
@@ -44,31 +44,29 @@ else
                     <td>@todoList.CreatedOn</td>
                     <td>@todoList.ModifiedOn</td>
                 </tr>
-            }
+            } *@
         </tbody>
     </table>
 }
 
 @code {
-    static HttpClient client = new HttpClient();
+    private CreateToDoListDto createDto = new();
     public required string newToDoListTitle {get; set;}
-    private List<ToDoList> todoLists = [];
 
-    private class ToDoList
+    protected override void OnInitialized()
     {
-        public required string ListTitle {get; set;}
+        createDto = new CreateToDoListDto();
+        //base.OnInitialized();
+    }
 
-        public required string? ListDescription {get; set;}
-        public required DateTime CreatedOn {get; set;}
-        public required DateTime ModifiedOn {get; set;}
-        
-        [SetsRequiredMembers]
-        public ToDoList(string _ListTitle)
+    private async void AddToDoList(string _newListTitle)
+    {
+        var newToDoList = new CreateToDoListDto
         {
-            ListTitle = _ListTitle;
-            CreatedOn = DateTime.Now;
-            ModifiedOn = DateTime.Now;
-        }
+            ListTitle = _newListTitle
+        };
+
+        await ToDoListService.PostToDoListAsync(newToDoList);
     }
 
     [Parameter]
@@ -83,15 +81,7 @@ else
         Console.WriteLine($"Attempting to create TODO List {newToDoListTitle}");
         if (!string.IsNullOrWhiteSpace(newToDoListTitle))
             {
-                
-                var newToDoList = new CreateToDoListDto
-                {
-                    ListTitle = newToDoListTitle
-                };
-
-                var service = new ToDoListService(client);
-                await service.PostToDoListAsync(newToDoList);
-
+                AddToDoList(newToDoListTitle);
                 Console.WriteLine($"Succesfully created TODO List {newToDoListTitle}");
             }
     }

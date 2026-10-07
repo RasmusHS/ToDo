@@ -5,13 +5,22 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>To-Do List</h1>
+<h1>To-Do Lists</h1>
 
-<button @onclick="OpenToDoPopup">Add new To-Do</button>
+<form method="post" @onsubmit="Submit" @formname="new-todo-list-creator">
+    <AntiforgeryToken />
+    <div>
+        <label>
+            Identifier: 
+            <InputText @bind-Value="newToDoListTitle" />
+        </label>
+    </div>
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</form>
 
-<Popup @ref="popupRef" />
-
-@if (todoItems == null)
+@if (todoLists == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -27,13 +36,13 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var todoItem in todoItems)
+            @foreach (var todoList in todoLists)
             {
                 <tr>
                     <td><input type="checkbox" @bind-value="@IsChecked" @bind-value:after="CheckboxChanged"></td>
-                    <td>@todoItem.Text</td>
-                    <td>@todoItem.CreatedOn</td>
-                    <td>@todoItem.ModifiedOn</td>
+                    <td>@todoList.ListTitle</td>
+                    <td>@todoList.CreatedOn</td>
+                    <td>@todoList.ModifiedOn</td>
                 </tr>
             }
         </tbody>
@@ -41,39 +50,49 @@ else
 }
 
 @code {
-    private List<ToDoItem> todoItems = [];
-    private Popup popupRef;
-    private async Task OpenToDoPopup()
+    static HttpClient client = new HttpClient();
+    public required string newToDoListTitle {get; set;}
+    private List<ToDoList> todoLists = [];
+
+    private class ToDoList
     {
-        popupRef.Show();
-        //string toDoToCreate;
-        //toDoToCreate = await popupRef.returnNewToDo();
-    }
-    public void CreateToDo(string nameText)
-    {
-        todoItems.Add( new ToDoItem(nameText));
-        Console.WriteLine($"Created TODO Item {nameText}");
-    }
-    private class ToDoItem
-    {
-        public required string Text {get; set;}
+        public required string ListTitle {get; set;}
+
+        public required string? ListDescription {get; set;}
         public required DateTime CreatedOn {get; set;}
         public required DateTime ModifiedOn {get; set;}
         
         [SetsRequiredMembers]
-        public ToDoItem(string descriptiveText)
+        public ToDoList(string _ListTitle)
         {
-            Text = descriptiveText;
+            ListTitle = _ListTitle;
             CreatedOn = DateTime.Now;
             ModifiedOn = DateTime.Now;
         }
     }
-    
 
     [Parameter]
     public bool IsChecked { get; set; } = true;
     private void CheckboxChanged()
     {
         Console.WriteLine($"Checkbox changed {IsChecked}");
+    }
+
+    public async void Submit()
+    {
+        Console.WriteLine($"Attempting to create TODO List {newToDoListTitle}");
+        if (!string.IsNullOrWhiteSpace(newToDoListTitle))
+            {
+                
+                var newToDoList = new CreateToDoListDto
+                {
+                    ListTitle = newToDoListTitle
+                };
+
+                var service = new ToDoListService(client);
+                await service.PostToDoListAsync(newToDoList);
+
+                Console.WriteLine($"Succesfully created TODO List {newToDoListTitle}");
+            }
     }
 }

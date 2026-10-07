@@ -20,26 +20,27 @@
     </div>
 </form>
 
-@if (false)
+@if (queryDto.Count <= 0)
 {
-    <p><em>Loading...</em></p>
+    <p><em>Add a list to begin</em></p>
 }
 else
 {
     <table class="table">
         <thead>
             <tr>
-                <th>Done</th>
-                <th>ToDo </th>
+                <th>List Title</th>
+                <th>Items </th>
                 <th>Created On</th>
                 <th>Modified On</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var todoList in responseDtos)
+            @foreach (var todoList in queryDto)
             {
                 <tr>
                     <td>@todoList.ListTitle</td>
+                    <td>0</td>
                     <td>@todoList.CreatedOn</td>
                     <td>@todoList.ModifiedOn</td>
                 </tr>
@@ -52,7 +53,7 @@ else
     private CreateToDoListDto createDto = new();
     public required string newToDoListTitle {get; set;}
 
-    private List<ToDoListResponseDto> responseDtos = new();
+    private List<QueryToDoListDto> queryDto = new();
 
     protected override void OnInitialized()
     {
@@ -66,9 +67,9 @@ else
         {
             ListTitle = _newListTitle
         };
-        responseDtos.Add(await ToDoListService.PostToDoListAsync(newToDoList));
+        await ToDoListService.PostToDoListAsync(newToDoList);
         Console.WriteLine($"Succesfully ADDED TODO List {_newListTitle}");
-        StateHasChanged();
+        await updateListTable();
     }
     public async void Submit()
     {
@@ -82,6 +83,7 @@ else
 
     private async Task updateListTable()
     {
-        
+        queryDto = await ToDoListService.GetAllToDoListsAsync();
+        StateHasChanged();
     }
 }

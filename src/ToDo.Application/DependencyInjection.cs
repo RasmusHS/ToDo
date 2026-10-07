@@ -3,6 +3,8 @@ using ToDo.Application.CQRS.Commands.ToDoItem;
 using ToDo.Application.CQRS.Commands.ToDoItem.Handlers;
 using ToDo.Application.CQRS.Commands.ToDoList;
 using ToDo.Application.CQRS.Commands.ToDoList.Handlers;
+using ToDo.Application.CQRS.Queries.ToDoList;
+using ToDo.Application.CQRS.Queries.ToDoList.Handlers;
 using ToDo.Application.Profiles;
 
 namespace ToDo.Application;
@@ -17,6 +19,8 @@ public static class DependencyInjection
 
         // ToDoList
         services.AddScoped<ICreateToDoListCommand, CreateToDoListCommandHandler>();
+
+        services.AddScoped<IGetAllToDoListsQuery, GetAllToDoListsQueryHandler>();
 
         // ToDoItem
         services.AddScoped<ICreateToDoItemCommand, CreateToDoItemCommandHandler>();

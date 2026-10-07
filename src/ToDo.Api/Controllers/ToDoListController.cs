@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToDo.Application.CQRS.Commands.ToDoList;
+using ToDo.Application.CQRS.Queries.ToDoList;
 using ToDo.Application.DTO;
 using ToDo.Application.DTO.Commands.ToDoList;
 
@@ -10,10 +11,12 @@ namespace ToDo.Api.Controllers;
 public class ToDoListController : ControllerBase
 {
     private readonly ICreateToDoListCommand _createToDoList;
+    private readonly IGetAllToDoListsQuery _getAllToDoLists;
 
-    public ToDoListController(ICreateToDoListCommand createToDoList)
+    public ToDoListController(ICreateToDoListCommand createToDoList, IGetAllToDoListsQuery getAllToDoLists)
     {
         _createToDoList = createToDoList;
+        _getAllToDoLists = getAllToDoLists;
     }
 
     [HttpPost]
@@ -47,5 +50,17 @@ public class ToDoListController : ControllerBase
         {
             return BadRequest(commandResult.AsT1);
         }
+    }
+
+    [HttpGet]
+    [Route("getAllToDoLists")]
+    public async Task<IActionResult> GetAllToDoLists()
+    {
+        var queryResult = await _getAllToDoLists.GetAllAsync();
+
+        if (queryResult.IsT0)
+            return Ok(queryResult.AsT0);
+        else
+            return NotFound(queryResult.AsT1);
     }
 }

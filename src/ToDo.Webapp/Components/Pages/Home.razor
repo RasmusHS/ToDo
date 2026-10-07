@@ -36,15 +36,14 @@ else
             </tr>
         </thead>
         <tbody>
-            @* @foreach (var todoList in todoLists)
+            @foreach (var todoList in responseDtos)
             {
                 <tr>
-                    <td><input type="checkbox" @bind-value="@IsChecked" @bind-value:after="CheckboxChanged"></td>
                     <td>@todoList.ListTitle</td>
                     <td>@todoList.CreatedOn</td>
                     <td>@todoList.ModifiedOn</td>
                 </tr>
-            } *@
+            }
         </tbody>
     </table>
 }
@@ -52,6 +51,8 @@ else
 @code {
     private CreateToDoListDto createDto = new();
     public required string newToDoListTitle {get; set;}
+
+    private List<ToDoListResponseDto> responseDtos = new();
 
     protected override void OnInitialized()
     {
@@ -65,24 +66,22 @@ else
         {
             ListTitle = _newListTitle
         };
-
-        await ToDoListService.PostToDoListAsync(newToDoList);
+        responseDtos.Add(await ToDoListService.PostToDoListAsync(newToDoList));
+        Console.WriteLine($"Succesfully ADDED TODO List {_newListTitle}");
+        StateHasChanged();
     }
-
-    [Parameter]
-    public bool IsChecked { get; set; } = true;
-    private void CheckboxChanged()
-    {
-        Console.WriteLine($"Checkbox changed {IsChecked}");
-    }
-
     public async void Submit()
     {
         Console.WriteLine($"Attempting to create TODO List {newToDoListTitle}");
         if (!string.IsNullOrWhiteSpace(newToDoListTitle))
-            {
-                AddToDoList(newToDoListTitle);
-                Console.WriteLine($"Succesfully created TODO List {newToDoListTitle}");
-            }
+        {
+            AddToDoList(newToDoListTitle);
+            Console.WriteLine($"Succesfully CREATED TODO List {newToDoListTitle}");
+        }
+    }
+
+    private async Task updateListTable()
+    {
+        
     }
 }

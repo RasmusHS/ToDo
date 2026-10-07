@@ -1,0 +1,10 @@
+
+
+@code {
+    [Parameter]
+    public bool IsChecked { get; set; } = true;
+    private void CheckboxChanged()
+    {
+        Console.WriteLine($"Checkbox changed {IsChecked}");
+    }
+}

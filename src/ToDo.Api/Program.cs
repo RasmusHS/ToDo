@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
 
 // open Package Manager Console
 // Add-Migration
@@ -40,6 +41,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowBlazorClient");
 
 //app.UseHttpsRedirection();
+
+app.UseExceptionHandler();
 
 app.UseRouting();
 

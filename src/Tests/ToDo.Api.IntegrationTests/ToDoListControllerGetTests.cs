@@ -227,5 +227,4 @@ public class ToDoListControllerGetTests : BaseIntegrationTest
         var errors = await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>();
         Assert.Equal("entity.collection.not.found", Assert.Single(errors!).ErrorCode);
     }
-
 }

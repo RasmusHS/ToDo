@@ -16,7 +16,7 @@ public class ToDoListController : ControllerBase
     private readonly IGetAllToDoListsQuery _getAllToDoLists;
     private readonly IGetToDoListQuery _getToDoList;
 
-    public ToDoListController(ICreateToDoListCommand createToDoList)
+    public ToDoListController(ICreateToDoListCommand createToDoList, IGetAllToDoListsQuery getAllToDoLists, IGetToDoListQuery getToDoList)
     {
         _createToDoList = createToDoList;
         _getAllToDoLists = getAllToDoLists;
@@ -81,6 +81,4 @@ public class ToDoListController : ControllerBase
         else
             return NotFound(queryResult.AsT1);
     }
-
-
 }

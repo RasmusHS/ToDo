@@ -58,3 +58,17 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* Styling that couldn't be placed normally due to some rule thing with the "inputText" */
+.todoField {
+    border-radius: 8px;
+    padding: 4px;
+}
+
+#todoListTitleField {
+    width: 30%;
+}
+
+#todoListDescriptionField {
+    width: 60%
+}

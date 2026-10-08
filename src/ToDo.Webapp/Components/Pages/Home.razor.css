@@ -1,0 +1,27 @@
+.todoButton {
+    background-color:darkorchid;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.todoCreateLabel {
+    width: 100%;
+    padding-bottom: 10px;
+}
+
+#todoListTable {
+    th {
+        background-color: darkorchid;
+    }    
+}
+
+/* Doesn't work for some reason...
+    #todoListTable tr:nth-child(even) {background-color:black;} 
+*/
+
+
+/*  Styling for the inputText is here: 
+        ToDo\src\ToDo.Webapp\wwwroot\app.css 
+    Because for some reason it cannot be styled like normal and needs to be there to listen
+*/

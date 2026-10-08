@@ -5,18 +5,19 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>To-Do Lists</h1>
+<h1 class="todoTitle">Overview of To-Do lists</h1>
 
 <form method="post" @onsubmit="Submit" @formname="new-todo-list-creator">
     <AntiforgeryToken />
     <div>
-        <label>
-            Identifier: 
-            <InputText @bind-Value="newToDoListTitle" />
+        <label class="todoCreateLabel">
+            Create new Todo-list:
+            <br>
+            <InputText class="todoField" id="todoListTitleField" placeholder="Insert title" @bind-Value="newToDoListTitle" />
+            <InputText class="todoField" id="todoListDescriptionField" placeholder="Insert description (not required)" 
+                @bind-value="newTodoListDescription" />
+            <button class="todoButton" id="todoListSubmitButton" type="submit">Submit</button>
         </label>
-    </div>
-    <div>
-        <button type="submit">Submit</button>
     </div>
 </form>
 
@@ -26,13 +27,14 @@
 }
 else
 {
-    <table class="table">
+    <table class="table" id="todoListTable">
         <thead>
             <tr>
                 <th>List Title</th>
                 <th>Items </th>
                 <th>Created On</th>
                 <th>Modified On</th>
+                <th>Delete</th>
             </tr>
         </thead>
         <tbody>
@@ -43,6 +45,7 @@ else
                     <td>0</td>
                     <td>@todoList.CreatedOn</td>
                     <td>@todoList.ModifiedOn</td>
+                    <td> <button class="todoButton" id="todoListDeleteButton" @onclick="removeTodoList">Delete</button></td> 
                 </tr>
             }
         </tbody>
@@ -52,6 +55,7 @@ else
 @code {
     private CreateToDoListDto createDto = new();
     public required string newToDoListTitle {get; set;}
+    public string newTodoListDescription {get; set;}
 
     private List<QueryToDoListDto> queryDto = new();
 
@@ -68,6 +72,7 @@ else
 
     private async void AddToDoList(string _newListTitle)
     {
+        @* TODO - update method to also include "newTodoListDescription" when there is one *@
         var newToDoList = new CreateToDoListDto
         {
             ListTitle = _newListTitle
@@ -90,5 +95,11 @@ else
     {
         queryDto = await ToDoListService.GetAllToDoListsAsync();
         StateHasChanged();
+    }
+
+    private async void removeTodoList()
+    {
+        @* TODO - Implement this method *@
+        Console.WriteLine("Not implemented yet");
     }
 }

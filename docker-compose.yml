@@ -27,15 +27,8 @@ services:
       dockerfile: ./src/ToDo.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      #- ASPNETCORE_URLS=https://+:7156;http://+:5295
-      #- ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_HTTP_PORTS=8080
-      #- ASPNETCORE_HTTPS_PORTS=8081
-      #- ASPNETCORE_Kestrel__Certificates__Default__Password= 
-      #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - ConnectionStrings__DefaultConnection=Host=todo.db;Port=5432;Database=todo;Username=sa;Password=postgres;Include Error Detail=true
-    #volumes:
-      #- ~/.aspnet/https:/https:ro
     depends_on:
       todo.db:
         condition: service_healthy

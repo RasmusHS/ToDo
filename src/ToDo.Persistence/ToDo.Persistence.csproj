@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+	<InternalsVisibleTo Include="ToDo.Persistence.Tests" />
   </ItemGroup>
 
 </Project>

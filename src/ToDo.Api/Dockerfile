@@ -7,12 +7,14 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/ToDo.Api/ToDo.Api.csproj", "src/ToDo.Api/"]
+COPY ["src/ToDo.Application/ToDo.Application.csproj", "src/ToDo.Application/"]
+COPY ["src/ToDo.Domain/ToDo.Domain.csproj", "src/ToDo.Domain/"]
+COPY ["src/ToDo.Persistence/ToDo.Persistence.csproj", "src/ToDo.Persistence/"]
 RUN dotnet restore "./src/ToDo.Api/ToDo.Api.csproj"
 COPY . .
 WORKDIR "/src/src/ToDo.Api"

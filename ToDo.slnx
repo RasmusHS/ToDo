@@ -16,5 +16,6 @@
     <Project Path="src/Tests/ToDo.Api.IntegrationTests/ToDo.Api.IntegrationTests.csproj" Id="ae5468b9-9e30-4142-b4ec-25feacb8ac62" />
     <Project Path="src/Tests/ToDo.Application.Tests/ToDo.Application.Tests.csproj" Id="fd567ffe-4614-44d3-a979-6b2fe3cf8c93" />
     <Project Path="src/Tests/ToDo.Domain.Tests/ToDo.Domain.Tests.csproj" Id="8e4106a8-0dea-4a53-854a-810ebe35f392" />
+    <Project Path="src/Tests/ToDo.Persistence.Tests/ToDo.Persistence.Tests.csproj" Id="8934f356-f153-4cec-abab-079e89e9e1db" />
   </Folder>
 </Solution>

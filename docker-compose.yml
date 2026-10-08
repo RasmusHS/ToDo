@@ -1,6 +1,6 @@
 services:
   todo.db:
-    image: postgres:latest
+    image: postgres:18
     container_name: todo.db
     environment:
       - POSTGRES_DB=todo
@@ -10,24 +10,32 @@ services:
       - "5432:5432"
     volumes:
       - ./.containers/db:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sa -d todo"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
 
   todo.api:
     ports:
       - "5295:8080"
       #- "7156:8081"
+    pull_policy: build
     image: ${DOCKER_REGISTRY-}todoapi
     build:
       context: .
       dockerfile: ./src/ToDo.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      #- "ASPNETCORE_URLS": "https://+:7156;http://+:5295"
-      - ASPNETCORE_URL=http://localhost
-      - ASPNETCORE_HTTP_PORT= 5295
-      #- "ASPNETCORE_Kestrel__Certificates__Default__Password": ""
-      #- "ASPNETCORE_Kestrel__Certificates__Default__Path": "/https/aspnetapp.pfx"
-      - ConnectionStrings:DefaultConnection= Host=todo.db;Port=5432;Database=todo;Username=sa;Password=postgres;Include Error Detail=true
+      #- ASPNETCORE_URLS=https://+:7156;http://+:5295
+      #- ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_HTTP_PORTS=8080
+      #- ASPNETCORE_HTTPS_PORTS=8081
+      #- ASPNETCORE_Kestrel__Certificates__Default__Password= 
+      #- ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ConnectionStrings__DefaultConnection=Host=todo.db;Port=5432;Database=todo;Username=sa;Password=postgres;Include Error Detail=true
     #volumes:
       #- ~/.aspnet/https:/https:ro
     depends_on:
-      - todo.db
+      todo.db:
+        condition: service_healthy

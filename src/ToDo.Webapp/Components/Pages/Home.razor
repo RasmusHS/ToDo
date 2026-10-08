@@ -61,6 +61,11 @@ else
         //base.OnInitialized();
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await updateListTable();
+    }
+
     private async void AddToDoList(string _newListTitle)
     {
         var newToDoList = new CreateToDoListDto

@@ -1,4 +1,6 @@
-﻿@inject IToDoListService ToDoListService
+﻿@using ToDo.Webapp.Dto.Queries.ToDoList
+@using ToDo.Webapp.Services
+@inject IToDoListService ToDoListService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -29,7 +31,7 @@
 
 @code
 {
-    private List<QueryToDoListDto> queryDto = new();
+    private List<QueryToDoListSummaryDto> queryDto = new();
     protected override async Task OnInitializedAsync()
     {
         await updateListTable();

@@ -1,3 +1,7 @@
+using ToDo.Webapp.Dto.Queries.ToDoItem;
+
+namespace ToDo.Webapp.Dto.Queries.ToDoList;
+
 public class QueryToDoListDto
 {
     /// <summary>

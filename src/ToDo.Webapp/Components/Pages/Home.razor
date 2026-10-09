@@ -1,5 +1,7 @@
 ﻿@page "/"
 @using System.Diagnostics.CodeAnalysis
+@using ToDo.Webapp.Dto.Queries.ToDoList
+@using ToDo.Webapp.Services
 @inject IToDoListService ToDoListService
 @rendermode InteractiveServer
 
@@ -53,7 +55,7 @@ else
     private CreateToDoListDto createDto = new();
     public required string newToDoListTitle {get; set;}
 
-    private List<QueryToDoListDto> queryDto = new();
+    private List<QueryToDoListSummaryDto> queryDto = new();
 
     protected override void OnInitialized()
     {

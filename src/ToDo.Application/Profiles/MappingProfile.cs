@@ -12,6 +12,8 @@ public class MappingProfile : Profile
     {
         //CreateMap<, >().ReverseMap();
         CreateMap<ToDoListEntity, ToDoListResponseDto>().ReverseMap();
+        CreateMap<ToDoListEntity, QueryToDoListSummaryDto>()
+            .ForMember(d => d.ItemCount, o => o.MapFrom(s => s.ToDoItems.Count()));
         CreateMap<ToDoListEntity, CreateToDoListDto>().ReverseMap();
         CreateMap<ToDoListEntity, UpdateToDoListDto>().ReverseMap();
         CreateMap<ToDoListEntity, QueryToDoListDto>().ReverseMap();

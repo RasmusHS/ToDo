@@ -1,5 +1,5 @@
 .todoButton {
-    background-color:darkorchid;
+    background-color:rgb(131, 105, 202);
     text-align: center;
     cursor: pointer;
     border-radius: 8px;
@@ -12,16 +12,12 @@
 
 #todoListTable {
     th {
-        background-color: darkorchid;
+        background-color: rgb(131, 105, 202);
     }    
 }
 
-/* Doesn't work for some reason...
-    #todoListTable tr:nth-child(even) {background-color:black;} 
-*/
 
-
-/*  Styling for the inputText is here: 
+/*  Styling for the 'inputText' fields has been placed here: 
         ToDo\src\ToDo.Webapp\wwwroot\app.css 
-    Because for some reason it cannot be styled like normal and needs to be there to listen
+    Because for some reason it cannot be styled like normal and needs to be there to work
 */

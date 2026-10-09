@@ -27,9 +27,9 @@
 }
 else
 {
-    <table class="table" id="todoListTable">
+    <table class="table table-striped table-hover" id="todoListTable">
         <thead>
-            <tr>
+            <tr class="todoRow">
                 <th>List Title</th>
                 <th>Items </th>
                 <th>Created On</th>
@@ -40,7 +40,7 @@ else
         <tbody>
             @foreach (var todoList in queryDto)
             {
-                <tr>
+                <tr class="todoRow">
                     <td>@todoList.ListTitle</td>
                     <td>0</td>
                     <td>@todoList.CreatedOn</td>
@@ -100,6 +100,6 @@ else
     private async void removeTodoList()
     {
         @* TODO - Implement this method *@
-        Console.WriteLine("Not implemented yet");
+        Console.WriteLine("Deleting lists not implemented yet");
     }
 }

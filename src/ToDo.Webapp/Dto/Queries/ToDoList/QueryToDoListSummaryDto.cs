@@ -1,8 +1,6 @@
-using ToDo.Webapp.Dto.Queries.ToDoItem;
+﻿namespace ToDo.Webapp.Dto.Queries.ToDoList;
 
-namespace ToDo.Webapp.Dto.Queries.ToDoList;
-
-public class QueryToDoListDto
+public class QueryToDoListSummaryDto
 {
     /// <summary>
     /// Unique PK identifier for each ToDoListEntity.
@@ -32,6 +30,8 @@ public class QueryToDoListDto
     /// </summary>
     public DateTime ModifiedOn { get; set; }
 
-    public List<QueryToDoItemDto>? ToDoItems {get; set;}
-    
+    /// <summary>
+    /// The number of ToDoItemEntities associated with this ToDoListEntity.
+    /// </summary>
+    public int ItemCount { get; set; }
 }

@@ -1,3 +1,5 @@
+namespace ToDo.Webapp.Dto.Queries.ToDoItem;
+
 public class QueryToDoItemDto
 {
     /// <summary>

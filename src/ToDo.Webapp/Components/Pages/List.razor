@@ -28,6 +28,7 @@
             <th>To-Do</th>
             <th>Created On</th>
             <th>Modified On</th>
+            <th>Delete</th>
         </tr>
     </thead>
     <tbody>
@@ -38,7 +39,6 @@
                 <td>@todoItem.CreatedOn</td>
                 <td>@todoItem.ModifiedOn</td>
                 <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="removeTodoItem">Delete</button></td> 
-
             </tr>
         }
     </tbody>

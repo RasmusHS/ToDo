@@ -72,3 +72,7 @@ h1:focus {
 #todoListDescriptionField {
     width: 60%
 }
+
+#todoItemField {
+    width: 30%;
+}

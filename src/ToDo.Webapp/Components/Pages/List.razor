@@ -11,18 +11,18 @@
     <AntiforgeryToken />
     <div>
         <label>
-            Identifier: 
-            <InputText @bind-Value="newToDoItemText" />
+            Create new Todo: 
+            <InputText class="todoField" id="todoItemField" @bind-Value="newToDoItemText" />
         </label>
         <div>
-            <button type="submit">Submit</button>
+            <button class="todoButton" id="todoItemSubmitButton" type="submit">Submit</button>
         </div>
     </div>
     
 </form>
 
 
-<table class="table">
+<table class="table table-striped table-hover" id="todoItemTable">
     <thead>
         <tr>
             <th>To-Do</th>
@@ -37,6 +37,8 @@
                 <td>@todoItem.Text</td>
                 <td>@todoItem.CreatedOn</td>
                 <td>@todoItem.ModifiedOn</td>
+                <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="removeTodoItem">Delete</button></td> 
+
             </tr>
         }
     </tbody>
@@ -91,6 +93,12 @@
     {
         queryDto = await ToDoItemService.GetToDoItemsFromListAsync(listId);
         StateHasChanged();
+    }
+
+    private async void removeTodoItem()
+    {
+        @* TODO - Implement this method *@
+        Console.WriteLine("Deleting todoItems not implemented yet");
     }
 
 }

@@ -29,7 +29,7 @@ else
 {
     <table class="table table-striped table-hover" id="todoListTable">
         <thead>
-            <tr class="todoRow">
+            <tr>
                 <th>List Title</th>
                 <th>Items </th>
                 <th>Created On</th>
@@ -40,7 +40,7 @@ else
         <tbody>
             @foreach (var todoList in queryDto)
             {
-                <tr class="todoRow">
+                <tr>
                     <td>@todoList.ListTitle</td>
                     <td>0</td>
                     <td>@todoList.CreatedOn</td>

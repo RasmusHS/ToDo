@@ -1,10 +1,96 @@
+@page "/list"
+@page "/list/{listId?}"
 
+@inject IToDoItemService ToDoItemService
+@rendermode InteractiveServer
+
+<PageTitle>List Example</PageTitle>
+
+
+<form method="post" @onsubmit="Submit" @formname="new-todo-item-creator">
+    <AntiforgeryToken />
+    <div>
+        <label>
+            Identifier: 
+            <InputText @bind-Value="newToDoItemText" />
+        </label>
+        <div>
+            <button type="submit">Submit</button>
+        </div>
+    </div>
+    
+</form>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>To-Do</th>
+            <th>Created On</th>
+            <th>Modified On</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var todoItem in queryDto)
+        {
+            <tr>
+                <td>@todoItem.Text</td>
+                <td>@todoItem.CreatedOn</td>
+                <td>@todoItem.ModifiedOn</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private CreateToDoItemDto createDto = new();
+
+    private List<QueryToDoItemDto> queryDto = new();
+    
+    public required string newToDoItemText {get; set;}
+
     [Parameter]
-    public bool IsChecked { get; set; } = true;
-    private void CheckboxChanged()
+    public Guid listId {get; set;}
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine($"Checkbox changed {IsChecked}");
+        //NavigationManager.OnNotFound += HandleNotFound;
+
+        await updateItemTable();
+
+        if (queryDto == null)
+        {
+            //NavigationManager.NotFound();
+            Console.WriteLine($"List not found with Id {listId}");
+        }
     }
+    private async void GetList(Guid id)
+    {
+        queryDto = await ToDoItemService.GetToDoItemsFromListAsync(id);
+    }
+    private async void AddToDoItem(string _newItemText)
+    {
+        var newToDoList = new CreateToDoItemDto
+        {
+            Text = _newItemText
+        };
+        //await ToDoItemService.PostToDoListAsync(newToDoList);
+        Console.WriteLine($"Succesfully ADDED TODO Item {_newItemText}");
+        await updateItemTable();
+    }
+    public async void Submit()
+    {
+        Console.WriteLine($"Attempting to create TODO Item {newToDoItemText}");
+        if (!string.IsNullOrWhiteSpace(newToDoItemText))
+        {
+            AddToDoItem(newToDoItemText);
+            Console.WriteLine($"Succesfully CREATED TODO Item {newToDoItemText}");
+        }
+    }
+
+    private async Task updateItemTable()
+    {
+        queryDto = await ToDoItemService.GetToDoItemsFromListAsync(listId);
+        StateHasChanged();
+    }
+
 }

@@ -6,6 +6,13 @@ public class ToDoItemService : IToDoItemService
     {
         _httpClient = httpClient;
     }
+
+    public async Task<List<QueryToDoItemDto>> GetToDoItemsFromListAsync(Guid listId)
+    {
+        var response = await _httpClient.GetFromJsonAsync<List<QueryToDoItemDto>>($"api/ToDoItem/getToDoItemsFromList{listId}");
+        return response;
+    }
+
     public async Task<ToDoItemResponseDto> PostToDoItemAsync(CreateToDoItemDto dto)
     {
         var response = await _httpClient.PostAsJsonAsync("api/ToDoItem/postToDoItem", dto);

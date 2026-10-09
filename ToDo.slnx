@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".github/workflows/main.yml" />
+    <File Path=".gitignore" />
     <File Path="docker-compose.yml" />
   </Folder>
   <Folder Name="/src/">

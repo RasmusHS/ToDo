@@ -19,11 +19,18 @@ public class GetAllToDoListsQueryHandler : IGetAllToDoListsQuery
         _mapper = mapper;
     }
 
-    public async Task<OneOf<List<QueryToDoListDto>, List<ErrorResponseDto>>> GetAllAsync()
+    /// <summary>
+    /// Gets all ToDo lists, returning a summary of each list.
+    /// </summary>
+    /// <inheritdoc cref="IGetAllToDoListsQuery.GetAllAsync"/>
+    /// <returns></returns>
+    public async Task<OneOf<List<QueryToDoListSummaryDto>, List<ErrorResponseDto>>> GetAllAsync()
     {
         List<ErrorResponseDto> errors = new List<ErrorResponseDto>();
 
-        var result = await _dbContext.ToDoLists.ToListAsync();
+        var result = await _mapper
+            .ProjectTo<QueryToDoListSummaryDto>(_dbContext.ToDoLists)
+            .ToListAsync();
 
         if (!result.Any())
         {
@@ -31,6 +38,6 @@ public class GetAllToDoListsQueryHandler : IGetAllToDoListsQuery
             return errors;
         }
 
-        return _mapper.Map<List<QueryToDoListDto>>(result);
+        return result;
     }
 }

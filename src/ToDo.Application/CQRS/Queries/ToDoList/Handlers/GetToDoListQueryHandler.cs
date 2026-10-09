@@ -19,6 +19,12 @@ public class GetToDoListQueryHandler : IGetToDoListQuery
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Gets a specific ToDo list by its ID, including the ToDo items associated with the list.
+    /// </summary>
+    /// <inheritdoc cref="IGetToDoListQuery.GetAsync"/> 
+    /// <param name="id"></param>
+    /// <returns></returns>
     public async Task<OneOf<QueryToDoListDto, List<ErrorResponseDto>>> GetAsync(Guid id)
     {
         List<ErrorResponseDto> errors = new List<ErrorResponseDto>();
@@ -26,6 +32,7 @@ public class GetToDoListQueryHandler : IGetToDoListQuery
         try
         {
             var result = await _dbContext.ToDoLists
+                .AsNoTracking()
                 .Include(tdl => tdl.ToDoItems)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (result == null)

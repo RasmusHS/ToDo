@@ -1,9 +1,13 @@
 using AutoMapper;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using ToDo.Application.CQRS.Queries.ToDoList.Handlers;
 using ToDo.Application.DTO.Queries;
+using ToDo.Application.Errors;
+using ToDo.Application.Profiles;
 using ToDo.Domain;
 using ToDo.Persistence;
 
@@ -13,7 +17,6 @@ public class GetAllToDoListsQueryTests : IDisposable
 {
     private readonly DbContextOptions<ToDoDbContext> _options;
     private readonly ToDoDbContext _dbContext;
-    private readonly Mock<IMapper> _mapper = new();
     private readonly GetAllToDoListsQueryHandler _sut;
 
     public GetAllToDoListsQueryTests()
@@ -23,7 +26,7 @@ public class GetAllToDoListsQueryTests : IDisposable
             .Options;
 
         _dbContext = new ToDoDbContext(_options);
-        _sut = new GetAllToDoListsQueryHandler(_dbContext, _mapper.Object);
+        _sut = new GetAllToDoListsQueryHandler(_dbContext, CreateMapper());
 
     }
 
@@ -31,99 +34,90 @@ public class GetAllToDoListsQueryTests : IDisposable
 
     // ---Helpers---
 
+    private static IMapper CreateMapper() =>
+        new MapperConfiguration(
+            cfg => cfg.AddProfile<MappingProfile>(),
+            NullLoggerFactory.Instance)
+        .CreateMapper();
+
     /// <summary>
     /// Seeds through a separate context so the handler's context starts with nothing tracked.
     /// </summary>
-    private List<Guid> SeedLists(int count, int itemsPerList = 0)
+    private List<ToDoListEntity> SeedLists(params int[] itemsPerList)
     {
         using var seedContext = new ToDoDbContext(_options);
-        var ids = new List<Guid>();
+        var lists = new List<ToDoListEntity>();
 
-        for (var i = 0; i < count; i++)
+        foreach (var itemCount in itemsPerList)
         {
             var list = new ToDoListEntity(StringRandom.GetRandomString(20), null);
             seedContext.ToDoLists.Add(list);
-            ids.Add(list.Id);
+            lists.Add(list);
 
-            for (var j = 0; j < itemsPerList; j++)
-            {
+            for (var j = 0; j < itemCount; j++)
                 seedContext.ToDoItems.Add(new ToDoItemEntity(list.Id, StringRandom.GetRandomString(50), null));
-            }
         }
 
         seedContext.SaveChanges();
-        return ids;
-    }
-
-    private List<QueryToDoListDto> SetupMapper()
-    {
-        var response = new List<QueryToDoListDto>();
-        _mapper.Setup(m => m.Map<List<QueryToDoListDto>>(It.IsAny<List<ToDoListEntity>>()))
-            .Returns(response);
-        return response;
+        return lists;
     }
 
     // ---Lists exist---
 
     [Fact]
-    public async Task GetAllAsync_ListsExist_ReturnsMappedDtos()
+    public async Task GetAllAsync_SingleList_ReturnsSuccess()
     {
-        SeedLists(count: 2);
-        var response = SetupMapper();
+        SeedLists(0);
 
         var result = await _sut.GetAllAsync();
 
         Assert.True(result.IsT0);
-        Assert.Same(response, result.AsT0);
     }
 
     /// <summary>
     /// No ORDER BY in the query, so compare as sets, not sequences.
     /// </summary>
     [Fact]
-    public async Task GetAllAsync_ListsExist_MapsEveryList()
+    public async Task GetAllAsync_ListsExist_ReturnsEveryList()
     {
-        var ids = SeedLists(count: 3);
-        SetupMapper();
-
-        await _sut.GetAllAsync();
-
-        _mapper.Verify(m => m.Map<List<QueryToDoListDto>>(
-            It.Is<List<ToDoListEntity>>(l =>
-                l.Count == 3 &&
-                l.Select(e => e.Id).ToHashSet().SetEquals(ids))), Times.Once);
-    }
-
-    [Fact]
-    public async Task GetAllAsync_SingleList_ReturnsSuccess()
-    {
-        SeedLists(count: 1);
-        SetupMapper();
+        var seeded = SeedLists(0, 0, 0);
 
         var result = await _sut.GetAllAsync();
 
-        Assert.True(result.IsT0);
+        var ids = result.AsT0.Select(d => d.Id).ToHashSet();
+        Assert.True(ids.SetEquals(seeded.Select(l => l.Id)));
     }
 
-    /// <summary>
-    /// Documents current behavior: no Include, so items are not loaded. Because the entity
-    /// initializes ToDoItems to an empty list, an unloaded collection looks identical to an
-    /// empty one. Flip this if the query gets .Include(l => l.ToDoItems).
-    /// </summary>
     [Fact]
-    public async Task GetAllAsync_ListsWithItems_DoesNotLoadItems()
+    public async Task GetAllAsync_ListsExist_MapsFields()
     {
-        SeedLists(count: 2, itemsPerList: 3);
-        SetupMapper();
+        var seeded = Assert.Single(SeedLists(0));
 
-        await _sut.GetAllAsync();
+        var result = await _sut.GetAllAsync();
 
-        _mapper.Verify(m => m.Map<List<QueryToDoListDto>>(
-            It.Is<List<ToDoListEntity>>(l => l.All(e => e.ToDoItems.Count == 0))), Times.Once);
+        var dto = Assert.Single(result.AsT0);
+        Assert.Equal(seeded.Id, dto.Id);
+        Assert.Equal(seeded.ListTitle, dto.ListTitle);
+        Assert.Equal(seeded.ListDescription, dto.ListDescription);
+        Assert.Equal(seeded.CreatedOn, dto.CreatedOn);
+        Assert.Equal(seeded.ModifiedOn, dto.ModifiedOn);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ListsWithItems_CountsItemsPerList()
+    {
+        var seeded = SeedLists(0, 1, 3);
+
+        var result = await _sut.GetAllAsync();
+
+        var counts = result.AsT0.ToDictionary(d => d.Id, d => d.ItemCount);
+        Assert.Equal(0, counts[seeded[0].Id]);
+        Assert.Equal(1, counts[seeded[1].Id]);
+        Assert.Equal(3, counts[seeded[2].Id]);
     }
 
     // ---No lists---
-    // Pins current behavior (error on empty). If empty becomes a successful [], replace these
+    // Pins current behavior (error on empty). If empty becomes a successful [], replace this
     // with a test asserting IsT0 and an empty result.
 
     [Fact]
@@ -133,15 +127,9 @@ public class GetAllToDoListsQueryTests : IDisposable
 
         Assert.True(result.IsT1);
         var error = Assert.Single(result.AsT1);
-        Assert.Equal("entity.collection.not.found", error.ErrorCode);
-    }
-
-    [Fact]
-    public async Task GetAllAsync_NoLists_DoesNotMap()
-    {
-        await _sut.GetAllAsync();
-
-        _mapper.VerifyNoOtherCalls();
+        var expected = ToDoListErrors.NotFoundCollection();
+        Assert.Equal(expected.ErrorCode, error.ErrorCode);
+        Assert.Equal(expected.ErrorMessage, error.ErrorMessage);
     }
 
     // ---Exceptions---
@@ -150,13 +138,11 @@ public class GetAllToDoListsQueryTests : IDisposable
     /// No catch-all: unexpected failures propagate to the global exception handler.
     /// </summary>
     [Fact]
-    public async Task GetAllAsync_MapperThrows_ExceptionPropagates()
+    public async Task GetAllAsync_ContextFails_ExceptionPropagates()
     {
-        SeedLists(count: 1);
-        _mapper.Setup(m => m.Map<List<QueryToDoListDto>>(It.IsAny<List<ToDoListEntity>>()))
-            .Throws<InvalidOperationException>();
+        _dbContext.Dispose();
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.GetAllAsync());
+        await Assert.ThrowsAsync<ObjectDisposedException>(() => _sut.GetAllAsync());
     }
 
 }

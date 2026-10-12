@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToDo.Application.CQRS.Commands.ToDoItem;
-using ToDo.Application.CQRS.Queries.ToDoItem;
 using ToDo.Application.DTO;
 using ToDo.Application.DTO.Commands.ToDoItem;
-using ToDo.Application.DTO.Queries;
-using ToDo.Application.Errors;
 
 namespace ToDo.Api.Controllers;
 
@@ -14,12 +11,9 @@ public class ToDoItemController : ControllerBase
 {
     private readonly ICreateToDoItemCommand _createToDoItem;
 
-    private readonly IGetToDoItemsFromListQuery _getToDoItemsFromList;
-
-    public ToDoItemController(ICreateToDoItemCommand createToDoItem, IGetToDoItemsFromListQuery getToDoItemsFromList)
+    public ToDoItemController(ICreateToDoItemCommand createToDoItem)
     {
         _createToDoItem = createToDoItem;
-        _getToDoItemsFromList = getToDoItemsFromList;
     }
 
     [HttpPost]
@@ -54,24 +48,5 @@ public class ToDoItemController : ControllerBase
         {
             return BadRequest(commandResult.AsT1);
         }
-    }
-    [HttpGet]
-    [Route("getTodoItemsFromList/{id}")]
-    public async Task<IActionResult> GetToDoItemsFromList(Guid id)
-    {
-        List<ErrorResponseDto> errors = new List<ErrorResponseDto>();
-
-        if (id == Guid.Empty)
-            errors.Add(ToDoItemErrors.InvalidData<QueryToDoItemDto>());
-
-        if (errors.Count > 0)
-            return BadRequest(errors);
-
-        var queryResult = await _getToDoItemsFromList.GetAsync(id);
-
-        if (queryResult.IsT0)
-            return Ok(queryResult.AsT0);
-        else
-            return NotFound(queryResult.AsT1);
     }
 }

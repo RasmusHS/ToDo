@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Testcontainers.PostgreSql;
 using ToDo.Persistence;
 
@@ -38,8 +37,10 @@ public class ToDoWebApplicationFactory : WebApplicationFactory<Program>, IAsyncL
             if (descriptor != null)
             {
                 services.Remove(descriptor);
-                services.RemoveAll<IDbContextOptionsConfiguration<ToDoDbContext>>();
             }
+
+            services.RemoveAll<DbContextOptions<ToDoDbContext>>();
+            services.RemoveAll<IDbContextOptionsConfiguration<ToDoDbContext>>();
 
             services.AddDbContext<ToDoDbContext>(options =>
             {

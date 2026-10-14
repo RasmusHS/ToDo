@@ -15,12 +15,14 @@ public class ToDoListController : ControllerBase
     private readonly ICreateToDoListCommand _createToDoList;
     private readonly IGetAllToDoListsQuery _getAllToDoLists;
     private readonly IGetToDoListQuery _getToDoList;
+    private readonly IUpdateToDoListCommand _updateToDoList;
 
-    public ToDoListController(ICreateToDoListCommand createToDoList, IGetAllToDoListsQuery getAllToDoLists, IGetToDoListQuery getToDoList)
+    public ToDoListController(ICreateToDoListCommand createToDoList, IGetAllToDoListsQuery getAllToDoLists, IGetToDoListQuery getToDoList, IUpdateToDoListCommand updateToDoList)
     {
         _createToDoList = createToDoList;
         _getAllToDoLists = getAllToDoLists;
         _getToDoList = getToDoList;
+        _updateToDoList = updateToDoList;
     }
 
     [HttpPost]
@@ -81,4 +83,32 @@ public class ToDoListController : ControllerBase
         else
             return NotFound(queryResult.AsT1);
     }
+
+    [HttpPut]
+    [Route("putToDoList")]
+    public async Task<IActionResult> PutToDoList(UpdateToDoListDto dto)
+    {
+        UpdateToDoListDto.Validator validator = new UpdateToDoListDto.Validator();
+        var result = await validator.ValidateAsync(dto);
+        List<ErrorResponseDto> errors = new List<ErrorResponseDto>();
+
+        if (!result.IsValid)
+        {
+            foreach (var error in result.Errors)
+            {
+                errors.Add(new ErrorResponseDto(error.ErrorCode, error.ErrorMessage));
+            }
+        }
+
+        if (errors.Count > 0)
+            return BadRequest(errors);
+
+        var commandResult = await _updateToDoList.UpdateAsync(dto);
+
+        if (commandResult.IsT0)
+            return Ok(commandResult.AsT0);
+        else
+            return BadRequest(commandResult.AsT1);
+    }
+
 }

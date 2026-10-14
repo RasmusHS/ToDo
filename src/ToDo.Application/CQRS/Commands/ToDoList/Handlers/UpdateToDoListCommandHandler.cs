@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using ToDo.Application.DTO;
 using ToDo.Application.DTO.Commands.ToDoList;
@@ -11,31 +12,30 @@ public class UpdateToDoListCommandHandler : IUpdateToDoListCommand
 {
     private readonly ToDoDbContext _dbContext;
     private readonly IMapper _mapper;
+
     public UpdateToDoListCommandHandler(ToDoDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
     }
+
     public async Task<OneOf<ToDoListResponseDto, List<ErrorResponseDto>>> UpdateAsync(UpdateToDoListDto dto)
     {
         List<ErrorResponseDto> errors = new List<ErrorResponseDto>(); // Initialize an empty list to hold error responses
 
-        if(!_dbContext.ToDoLists.Any(t => t.Id == dto.Id))
+        var result = await _dbContext.ToDoLists.FindAsync(dto.Id);
+
+        if (result == null)
         {
             errors.Add(ToDoListErrors.NotFound<UpdateToDoListDto>(dto.Id));
-        }
-
-        if(_dbContext.ToDoLists.Any(t => t.ListTitle == dto.ListTitle))
-        {
-            errors.Add(ToDoListErrors.AlreadyExists<UpdateToDoListDto>(dto.ListTitle));
-        }
-
-        if(errors.Count() > 0)
-        {
             return errors;
         }
 
-        var result = await _dbContext.ToDoLists.FindAsync(dto.Id);
+        if (await _dbContext.ToDoLists.AnyAsync(t => t.ListTitle == dto.ListTitle && t.Id != dto.Id))
+        {
+            errors.Add(ToDoListErrors.AlreadyExists<UpdateToDoListDto>(dto.ListTitle));
+            return errors;
+        }
 
         result.Update(dto.ListTitle, dto.ListDescription);
 
@@ -43,7 +43,5 @@ public class UpdateToDoListCommandHandler : IUpdateToDoListCommand
         await _dbContext.SaveChangesAsync();
 
         return _mapper.Map<ToDoListResponseDto>(result);
-        
-
     }
 }

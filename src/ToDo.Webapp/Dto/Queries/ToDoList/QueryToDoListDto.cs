@@ -32,6 +32,6 @@ public class QueryToDoListDto
     /// </summary>
     public DateTime ModifiedOn { get; set; }
 
-    public List<QueryToDoItemDto>? ToDoItems {get; set;}
+    public List<QueryToDoItemDto>? ToDoItems {get; set;} = new List<QueryToDoItemDto>();
     
 }

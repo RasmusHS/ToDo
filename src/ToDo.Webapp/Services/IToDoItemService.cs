@@ -6,4 +6,5 @@ public interface IToDoItemService
 {
     Task<List<QueryToDoItemDto>> GetToDoItemsFromListAsync(Guid listId);
     Task<ToDoItemResponseDto> PostToDoItemAsync(CreateToDoItemDto dto);
+    Task<ToDoItemResponseDto> PutToDoItemAsync(UpdateToDoItemDto dto);
 }

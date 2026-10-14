@@ -10,10 +10,12 @@ namespace ToDo.Api.Controllers;
 public class ToDoItemController : ControllerBase
 {
     private readonly ICreateToDoItemCommand _createToDoItem;
+    private readonly IUpdateToDoItemCommand _updateToDoItem;
 
-    public ToDoItemController(ICreateToDoItemCommand createToDoItem)
+    public ToDoItemController(ICreateToDoItemCommand createToDoItem, IUpdateToDoItemCommand updateToDoItem)
     {
         _createToDoItem = createToDoItem;
+        _updateToDoItem = updateToDoItem;
     }
 
     [HttpPost]
@@ -49,4 +51,39 @@ public class ToDoItemController : ControllerBase
             return BadRequest(commandResult.AsT1);
         }
     }
+
+    [HttpPut]
+    [Route("putToDoItem")]
+    public async Task<IActionResult> PutToDoList(UpdateToDoItemDto dto)
+    {
+        UpdateToDoItemDto.Validator validator = new UpdateToDoItemDto.Validator();
+        var result = await validator.ValidateAsync(dto);
+        List<ErrorResponseDto> errors = new List<ErrorResponseDto>();
+
+        if(!result.IsValid)
+        {
+            foreach (var error in result.Errors)
+            {
+                errors.Add(new ErrorResponseDto(error.ErrorCode, error.ErrorMessage));
+            }
+        }
+
+        if(errors.Count > 0)
+        {
+            return BadRequest(errors);
+        }
+
+        var commandResult = await _updateToDoItem.UpdateAsync(dto);
+
+        if(commandResult.IsT0)
+        {
+            return Ok(commandResult.AsT0);
+        }
+        else
+        {
+            return BadRequest(commandResult.AsT1);
+        }
+
+    }
+
 }

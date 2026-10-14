@@ -43,4 +43,12 @@ public class ToDoListService : IToDoListService
         var result = await response.Content.ReadFromJsonAsync<ToDoListResponseDto>();
         return result;
     }
+
+    public async Task<ToDoListResponseDto> PutToDoListAsync(UpdateToDoListDto dto)
+    {
+        var response = await _httpClient.PutAsJsonAsync("api/ToDoList/putToDoList", dto);
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<ToDoListResponseDto>();
+        return result;
+    }
 }

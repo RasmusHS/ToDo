@@ -1,44 +1,46 @@
-@page "/list"
-@page "/list/{listId?}"
-@using ToDo.Webapp.Dto.Queries.ToDoItem
+@page "/list/{listId:guid}"
+@using ToDo.Webapp.Dto.Queries.ToDoList
 @using ToDo.Webapp.Services
 
 @inject IToDoItemService ToDoItemService
+@inject IToDoListService ToDoListService
 @rendermode InteractiveServer
 
-<PageTitle>List Example</PageTitle>
+<PageTitle>@queryDto.ListTitle</PageTitle>
+<h1>@queryDto.ListTitle</h1>
+<h5>@queryDto.ListDescription</h5>
+<h6>Amount: @queryDto.ToDoItems!.Count</h6>
 
 
 <form method="post" @onsubmit="Submit" @formname="new-todo-item-creator">
     <AntiforgeryToken />
     <div>
-        <label>
-            Identifier: 
-            <InputText @bind-Value="newToDoItemText" />
+        <label class='todoCreateLabel'>
+            Create new Todo:
+            <br>
+            <InputText class="todoField" id="todoItemField" placeholder="Insert To-Do Title" @bind-Value="newToDoItemText" />
+            <button class="todoButton" id="todoItemSubmitButton" type="submit">Submit</button>
         </label>
-        <div>
-            <button type="submit">Submit</button>
-        </div>
     </div>
-    
 </form>
 
-
-<table class="table">
+<table class="table table-striped table-hover" id="todoItemTable">
     <thead>
         <tr>
             <th>To-Do</th>
             <th>Created On</th>
             <th>Modified On</th>
+            <th>Delete</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var todoItem in queryDto)
+        @foreach (var todoItem in queryDto.ToDoItems!)
         {
             <tr>
                 <td>@todoItem.Text</td>
                 <td>@todoItem.CreatedOn</td>
                 <td>@todoItem.ModifiedOn</td>
+                <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="removeTodoItem">Delete</button></td> 
             </tr>
         }
     </tbody>
@@ -47,12 +49,12 @@
 @code {
     private CreateToDoItemDto createDto = new();
 
-    private List<QueryToDoItemDto> queryDto = new();
+    private QueryToDoListDto queryDto = new();
     
     public required string newToDoItemText {get; set;}
 
     [Parameter]
-    public Guid listId {get; set;}
+    public Guid listId { get; set; }
     protected override async Task OnInitializedAsync()
     {
         //NavigationManager.OnNotFound += HandleNotFound;
@@ -65,18 +67,15 @@
             Console.WriteLine($"List not found with Id {listId}");
         }
     }
-    private async void GetList(Guid id)
+    private async void AddToDoItem(string text, string? status)
     {
-        queryDto = await ToDoItemService.GetToDoItemsFromListAsync(id);
-    }
-    private async void AddToDoItem(string _newItemText)
-    {
-        var newToDoList = new CreateToDoItemDto
+        var newToDoItem = new CreateToDoItemDto
         {
-            Text = _newItemText
+            ToDoListId = listId,
+            Text = text
         };
-        //await ToDoItemService.PostToDoListAsync(newToDoList);
-        Console.WriteLine($"Succesfully ADDED TODO Item {_newItemText}");
+        await ToDoItemService.PostToDoItemAsync(newToDoItem);
+        Console.WriteLine($"Succesfully ADDED TODO Item {text}");
         await updateItemTable();
     }
     public async void Submit()
@@ -84,15 +83,21 @@
         Console.WriteLine($"Attempting to create TODO Item {newToDoItemText}");
         if (!string.IsNullOrWhiteSpace(newToDoItemText))
         {
-            AddToDoItem(newToDoItemText);
+            AddToDoItem(newToDoItemText, null); // TODO: Null for now until status field has been added
             Console.WriteLine($"Succesfully CREATED TODO Item {newToDoItemText}");
         }
+        newToDoItemText = "";
     }
 
     private async Task updateItemTable()
     {
-        queryDto = await ToDoItemService.GetToDoItemsFromListAsync(listId);
+        queryDto = await ToDoListService.GetToDoListAsync(listId);
         StateHasChanged();
+    }
+    private async void removeTodoItem()
+    {
+        @* TODO - Implement this method *@
+        Console.WriteLine("Deleting todoItems not implemented yet");
     }
 
 }

@@ -21,10 +21,11 @@ public static class DependencyInjection
         services.AddScoped<ICreateToDoListCommand, CreateToDoListCommandHandler>();
         services.AddScoped<IGetToDoListQuery, GetToDoListQueryHandler>();
         services.AddScoped<IGetAllToDoListsQuery, GetAllToDoListsQueryHandler>();
-        services.AddScoped<IUpdateToDoItemCommand, UpdateToDoItemCommandHandler>();
+        services.AddScoped<IUpdateToDoListCommand, UpdateToDoListCommandHandler>();
 
         // ToDoItem
         services.AddScoped<ICreateToDoItemCommand, CreateToDoItemCommandHandler>();
+        services.AddScoped<IUpdateToDoItemCommand, UpdateToDoItemCommandHandler>();
 
         return services;
     }

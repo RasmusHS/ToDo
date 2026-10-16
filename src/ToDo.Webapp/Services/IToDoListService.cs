@@ -23,5 +23,12 @@ public interface IToDoListService
     /// </summary>
     /// <returns></returns>
     Task<List<QueryToDoListSummaryDto>> GetAllToDoListsAsync();
+
+    /// <summary>
+    /// Updates title and/or description of a given ToDoList
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task<ToDoListResponseDto> PutToDoListAsync(UpdateToDoListDto dto);
     
 }

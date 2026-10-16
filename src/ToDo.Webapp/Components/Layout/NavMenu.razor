@@ -1,6 +1,11 @@
 ﻿@using ToDo.Webapp.Dto.Queries.ToDoList
 @using ToDo.Webapp.Services
+@implements IDisposable
 @inject IToDoListService ToDoListService
+@inject NavigationManager Navigation
+@inject INavMenuService NavService
+
+@rendermode InteractiveServer
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -19,9 +24,10 @@
         </div>
         @foreach (var todoList in queryDto)
         {
+            string idString = $"list/{todoList.Id}";
             <div class="nav-item px-3">
-                <NavLink class="nav-link" href="list">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> @todoList.ListTitle
+                <NavLink class="nav-link" href=@idString> 
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true" ></span> @todoList.ListTitle 
                 </NavLink>
             </div>
         }
@@ -31,14 +37,38 @@
 
 @code
 {
+
     private List<QueryToDoListSummaryDto> queryDto = new();
+
+    protected override void OnInitialized()
+    {
+        NavService.OnUpdate += UpdateMenuAsync;
+    }
     protected override async Task OnInitializedAsync()
     {
-        await updateListTable();
+        await UpdateListTable();
     }
-    private async Task updateListTable()
+    private async Task UpdateListTable()
     {
         queryDto = await ToDoListService.GetAllToDoListsAsync();
+        
         StateHasChanged();
     }
+
+    private void GoToToDoList(Guid listId)
+    {
+        Navigation.NavigateTo($"/list/{listId}");
+    }
+    private async Task UpdateMenuAsync()
+    {
+        await InvokeAsync(() => StateHasChanged());
+        await UpdateListTable();
+    }
+
+    public void Dispose()
+    {
+        NavService.OnUpdate -= UpdateMenuAsync;
+    }
+
+    
 }

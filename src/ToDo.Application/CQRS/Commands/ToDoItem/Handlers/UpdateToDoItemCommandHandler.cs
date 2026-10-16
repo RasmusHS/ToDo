@@ -1,4 +1,3 @@
-
 using AutoMapper;
 using OneOf;
 using ToDo.Application.CQRS.Commands.ToDoItem;
@@ -17,6 +16,7 @@ public class UpdateToDoItemCommandHandler : IUpdateToDoItemCommand
         _dbContext = dbContext;
         _mapper = mapper;
     }
+
     public async Task<OneOf<ToDoItemResponseDto, List<ErrorResponseDto>>> UpdateAsync(UpdateToDoItemDto dto)
     {
         List<ErrorResponseDto> errors = new List<ErrorResponseDto>(); // Initialize an empty list to hold error responses
@@ -26,6 +26,12 @@ public class UpdateToDoItemCommandHandler : IUpdateToDoItemCommand
         if(result == null)
         {
             errors.Add(ToDoItemErrors.NotFound<UpdateToDoItemDto>(dto.Id));
+            return errors;
+        }
+
+        if (result.ToDoListId != dto.ToDoListId)
+        {
+            errors.Add(ToDoItemErrors.NotFoundInCollection<UpdateToDoItemDto>(dto.Id));
             return errors;
         }
 

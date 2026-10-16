@@ -54,7 +54,7 @@ public class ToDoItemController : ControllerBase
 
     [HttpPut]
     [Route("putToDoItem")]
-    public async Task<IActionResult> PutToDoList(UpdateToDoItemDto dto)
+    public async Task<IActionResult> PutToDoItem(UpdateToDoItemDto dto)
     {
         UpdateToDoItemDto.Validator validator = new UpdateToDoItemDto.Validator();
         var result = await validator.ValidateAsync(dto);
@@ -69,20 +69,14 @@ public class ToDoItemController : ControllerBase
         }
 
         if(errors.Count > 0)
-        {
             return BadRequest(errors);
-        }
 
         var commandResult = await _updateToDoItem.UpdateAsync(dto);
 
         if(commandResult.IsT0)
-        {
             return Ok(commandResult.AsT0);
-        }
         else
-        {
             return BadRequest(commandResult.AsT1);
-        }
 
     }
 

@@ -1,5 +1,7 @@
 @page "/list/{listId:guid}"
 @using ToDo.Webapp.Dto
+@using ToDo.Webapp.Components.Shared
+@using ToDo.Webapp.Dto.Queries.ToDoItem
 @using ToDo.Webapp.Dto.Queries.ToDoList
 @using ToDo.Webapp.Services
 
@@ -11,7 +13,6 @@
 <h1>@queryDto.ListTitle</h1>
 <h5>@queryDto.ListDescription</h5>
 <h6>Amount: @queryDto.ToDoItems!.Count</h6>
-
 
 <form method="post" @onsubmit="Submit" @formname="new-todo-item-creator">
     <AntiforgeryToken />
@@ -41,7 +42,7 @@
                 <td>@todoItem.Text</td>
                 <td>@todoItem.CreatedOn</td>
                 <td>@todoItem.ModifiedOn</td>
-                <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="removeTodoItem">Delete</button></td> 
+                <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="() => RemoveTodoItem(todoItem)">Delete</button></td> 
             </tr>
         }
     </tbody>
@@ -107,7 +108,8 @@
 
         StateHasChanged();
     }
-    private async void removeTodoItem()
+
+    private async void RemoveTodoItem(QueryToDoItemDto itemDto)
     {
         @* TODO - Implement this method *@
         Console.WriteLine("Deleting todoItems not implemented yet");

@@ -1,4 +1,5 @@
 @page "/list/{listId:guid}"
+@using ToDo.Webapp.Dto
 @using ToDo.Webapp.Dto.Queries.ToDoList
 @using ToDo.Webapp.Services
 
@@ -50,6 +51,7 @@
     private CreateToDoItemDto createDto = new();
 
     private QueryToDoListDto queryDto = new();
+    private List<ErrorResponseDto> errors = new();
     
     public required string newToDoItemText {get; set;}
 
@@ -91,7 +93,18 @@
 
     private async Task updateItemTable()
     {
-        queryDto = await ToDoListService.GetToDoListAsync(listId);
+        var result = await ToDoListService.GetToDoListAsync(listId);
+        
+        if (result.IsT0)
+        {
+            queryDto = result.AsT0;
+            errors.Clear();
+        }
+        else
+        {
+            errors.AddRange(result.AsT1);
+        }
+
         StateHasChanged();
     }
     private async void removeTodoItem()

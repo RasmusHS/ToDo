@@ -1,4 +1,5 @@
-﻿@using ToDo.Webapp.Dto.Queries.ToDoList
+﻿@using ToDo.Webapp.Dto
+@using ToDo.Webapp.Dto.Queries.ToDoList
 @using ToDo.Webapp.Services
 @implements IDisposable
 @inject IToDoListService ToDoListService
@@ -39,19 +40,31 @@
 {
 
     private List<QueryToDoListSummaryDto> queryDto = new();
+    private List<ErrorResponseDto> errors = new();
 
     protected override void OnInitialized()
     {
         NavService.OnUpdate += UpdateMenuAsync;
     }
+
     protected override async Task OnInitializedAsync()
     {
         await UpdateListTable();
     }
+
     private async Task UpdateListTable()
     {
-        queryDto = await ToDoListService.GetAllToDoListsAsync();
-        
+        var result = await ToDoListService.GetAllToDoListsAsync();
+        if (result.IsT0)
+        {
+            queryDto = result.AsT0;
+            errors.Clear();
+        }
+        else
+        {
+            errors.AddRange(result.AsT1);
+        }
+
         StateHasChanged();
     }
 
@@ -59,6 +72,7 @@
     {
         Navigation.NavigateTo($"/list/{listId}");
     }
+
     private async Task UpdateMenuAsync()
     {
         await InvokeAsync(() => StateHasChanged());
@@ -69,6 +83,4 @@
     {
         NavService.OnUpdate -= UpdateMenuAsync;
     }
-
-    
 }

@@ -1,5 +1,5 @@
 ﻿@page "/"
-@using System.Diagnostics.CodeAnalysis
+@using ToDo.Webapp.Dto
 @using ToDo.Webapp.Dto.Queries.ToDoList
 @using ToDo.Webapp.Services
 @inject IToDoListService ToDoListService
@@ -64,6 +64,7 @@ else
     public required string newTodoListDescription {get; set;}
 
     private List<QueryToDoListSummaryDto> queryDto = new();
+    private List<ErrorResponseDto> errors = new();
 
     protected override void OnInitialized()
     {
@@ -104,7 +105,18 @@ else
 
     private async Task UpdateListTable()
     {
-        queryDto = await ToDoListService.GetAllToDoListsAsync();
+        var result = await ToDoListService.GetAllToDoListsAsync();
+        
+        if (result.IsT0)
+        {
+            queryDto = result.AsT0;
+            errors.Clear();
+        }
+        else
+        {
+            errors.AddRange(result.AsT1);
+        }
+
         StateHasChanged();
     }
 

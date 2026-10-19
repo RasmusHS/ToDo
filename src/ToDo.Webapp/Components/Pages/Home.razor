@@ -2,6 +2,7 @@
 @using System.Diagnostics.CodeAnalysis
 @using ToDo.Webapp.Dto.Queries.ToDoList
 @using ToDo.Webapp.Services
+@using ToDo.Webapp.Components.Shared
 @inject IToDoListService ToDoListService
 @inject INavMenuService NavService
 @rendermode InteractiveServer
@@ -49,12 +50,18 @@ else
                     <td><a href=@idString class="d-block text-decoration-none text-dark"> @todoList.ItemCount </a></td>
                     <td><a href=@idString class="d-block text-decoration-none text-dark"> @todoList.CreatedOn </a></td>
                     <td><a href=@idString class="d-block text-decoration-none text-dark"> @todoList.ModifiedOn </a></td>
-                    <td> <button class="todoButton" id="todoListDeleteButton" @onclick="removeTodoList">Delete</button></td> 
+                    <td> <button class="todoButton" id="todoListDeleteButton" @onclick="() => ShowDeleteListPrompt(todoList)">Delete</button></td> 
                 </tr>
             }
         </tbody>
     </table>
 }
+
+<ConfirmationModal IsVisible="showDeleteModal"
+                   Title="Confirm Deletion"
+                   Message="@deleteMessage"
+                   OnConfirm="ConfirmDelete"
+                   OnCancel="CancelDelete" />
 
 @code {
     [Parameter] public EventCallback<List<QueryToDoListSummaryDto>> ListsChanged { get; set; }
@@ -70,6 +77,11 @@ else
         createDto = new CreateToDoListDto();
         //base.OnInitialized();
     }
+
+    // Modal vars
+    private bool showDeleteModal = false;
+    private string deleteMessage = "";
+    private QueryToDoListSummaryDto? selectedList;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,7 +101,7 @@ else
 
         await UpdateNavMenuAsync();
         Console.WriteLine("UPDATED NAVMENU");
-        
+
     }
     public async void Submit()
     {
@@ -98,7 +110,7 @@ else
         {
             AddToDoList(newToDoListTitle, newTodoListDescription);
             Console.WriteLine($"Succesfully CREATED TODO List {newToDoListTitle}");
-            
+
         }
     }
 
@@ -113,9 +125,28 @@ else
         return NavService.UpdateNavMenuAsync();
     }
 
-    private async void removeTodoList()
+    private void ShowDeleteListPrompt(QueryToDoListSummaryDto listDto)
+    {
+        selectedList = listDto;
+        deleteMessage = $"Are you sure you want to delete the list '{selectedList.ListTitle}'?";
+        showDeleteModal = true;
+    }
+
+    private void CancelDelete()
+    {
+        selectedList = null;
+        showDeleteModal = false;
+    }
+
+    private async void ConfirmDelete()
+    {
+        RemoveTodoList();
+    }
+
+    private async void RemoveTodoList()
     {
         @* TODO - Implement this method *@
+        
         Console.WriteLine("Deleting lists not implemented yet");
     }
 }

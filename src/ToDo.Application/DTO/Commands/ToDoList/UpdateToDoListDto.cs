@@ -24,13 +24,13 @@ public class UpdateToDoListDto
     /// The date and time on which a ToDoListEntity was created. 
     /// Only set at creation and then never touched again.
     /// </summary>
-    public DateTime CreatedOn { get; set; }
+    //public DateTime CreatedOn { get; set; }
 
     /// <summary>
     /// The date and time on which a ToDoListEntity was last updated.
     /// Only set in ctor and Update methods.
     /// </summary>
-    public DateTime ModifiedOn { get; set; }
+    //public DateTime ModifiedOn { get; set; }
 
     public class Validator : AbstractValidator<UpdateToDoListDto>
     {

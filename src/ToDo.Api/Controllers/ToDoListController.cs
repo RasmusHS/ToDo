@@ -16,13 +16,15 @@ public class ToDoListController : ControllerBase
     private readonly IGetAllToDoListsQuery _getAllToDoLists;
     private readonly IGetToDoListQuery _getToDoList;
     private readonly IUpdateToDoListCommand _updateToDoList;
+    private readonly IDeleteToDoListCommand _deleteToDoList;
 
-    public ToDoListController(ICreateToDoListCommand createToDoList, IGetAllToDoListsQuery getAllToDoLists, IGetToDoListQuery getToDoList, IUpdateToDoListCommand updateToDoList)
+    public ToDoListController(ICreateToDoListCommand createToDoList, IGetAllToDoListsQuery getAllToDoLists, IGetToDoListQuery getToDoList, IUpdateToDoListCommand updateToDoList, IDeleteToDoListCommand deleteToDoList)
     {
         _createToDoList = createToDoList;
         _getAllToDoLists = getAllToDoLists;
         _getToDoList = getToDoList;
         _updateToDoList = updateToDoList;
+        _deleteToDoList = deleteToDoList;
     }
 
     [HttpPost]
@@ -109,5 +111,17 @@ public class ToDoListController : ControllerBase
             return Ok(commandResult.AsT0);
         else
             return BadRequest(commandResult.AsT1);
+    }
+
+    [HttpDelete]
+    [Route("deleteToDoList/{id}")]
+    public async Task<IActionResult> DeleteToDoList(Guid id)
+    {
+        var commandResult = await _deleteToDoList.DeleteAsync(id);
+
+        if (commandResult.IsT0)
+            return NoContent();
+        else
+            return NotFound(commandResult.AsT1);
     }
 }

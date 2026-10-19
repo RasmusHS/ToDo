@@ -13,7 +13,6 @@
 <h5>@queryDto.ListDescription</h5>
 <h6>Amount: @queryDto.ToDoItems!.Count</h6>
 
-
 <form method="post" @onsubmit="Submit" @formname="new-todo-item-creator">
     <AntiforgeryToken />
     <div>
@@ -42,17 +41,11 @@
                 <td>@todoItem.Text</td>
                 <td>@todoItem.CreatedOn</td>
                 <td>@todoItem.ModifiedOn</td>
-                <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="() => ShowDeleteItemPrompt(todoItem)">Delete</button></td> 
+                <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="() => RemoveTodoItem(todoItem)">Delete</button></td> 
             </tr>
         }
     </tbody>
 </table>
-
-<ConfirmationModal IsVisible="showDeleteModal"
-                   Title="Confirm Deletion"
-                   Message="@deleteMessage"
-                   OnConfirm="ConfirmDelete"
-                   OnCancel="CancelDelete" />
 
 @code {
     private CreateToDoItemDto createDto = new();
@@ -60,10 +53,6 @@
     private QueryToDoListDto queryDto = new();
     
     public required string newToDoItemText {get; set;}
-    private bool showDeleteModal = false;
-    private string deleteMessage = "";
-    private QueryToDoItemDto? selectedItem;
-
 
     [Parameter]
     public Guid listId { get; set; }
@@ -106,23 +95,8 @@
         queryDto = await ToDoListService.GetToDoListAsync(listId);
         StateHasChanged();
     }
-    private void ShowDeleteItemPrompt(QueryToDoItemDto itemDto)
-    {
-        selectedItem = itemDto;
-        deleteMessage = $"Are you sure you want to delete '{selectedItem.Text}'?";
-        showDeleteModal = true;
-    }
-    private void CancelDelete()
-    {
-        selectedItem = null;
-        showDeleteModal = false;
-    }
 
-    private async void ConfirmDelete()
-    {
-        RemoveTodoItem();
-    }
-    private async void RemoveTodoItem()
+    private async void RemoveTodoItem(QueryToDoItemDto itemDto)
     {
         @* TODO - Implement this method *@
         Console.WriteLine("Deleting todoItems not implemented yet");

@@ -38,6 +38,7 @@ else
                 <th>Items </th>
                 <th>Created On</th>
                 <th>Modified On</th>
+                <th>Edit</th>
                 <th>Delete</th>
             </tr>
         </thead>
@@ -50,7 +51,8 @@ else
                     <td><a href=@idString class="d-block text-decoration-none text-dark"> @todoList.ItemCount </a></td>
                     <td><a href=@idString class="d-block text-decoration-none text-dark"> @todoList.CreatedOn </a></td>
                     <td><a href=@idString class="d-block text-decoration-none text-dark"> @todoList.ModifiedOn </a></td>
-                    <td> <button class="todoButton" id="todoListDeleteButton" @onclick="() => ShowDeleteListPrompt(todoList)">Delete</button></td> 
+                    <td> <button class="todoButton" id="todoListEditButton" @onclick="() => ShowEditListPrompt(todoList)">Edit</button></td>  
+                    <td> <button class="todoButton" id="todoListDeleteButton" @onclick="() => ShowDeleteListPrompt(todoList)">Delete</button></td>
                 </tr>
             }
         </tbody>
@@ -62,6 +64,11 @@ else
                    Message="@deleteMessage"
                    OnConfirm="ConfirmDelete"
                    OnCancel="CancelDelete" />
+
+<EditListModal     IsVisible="showEditListModal"
+                   Title="@editListTitle"
+                   OnConfirm="ConfirmEdit"
+                   OnCancel="CancelEdit" />
 
 @code {
     [Parameter] public EventCallback<List<QueryToDoListSummaryDto>> ListsChanged { get; set; }
@@ -83,6 +90,11 @@ else
     private string deleteMessage = "";
     private QueryToDoListSummaryDto? selectedList;
 
+    private bool showEditListModal = false;
+    private string editListTitle = "";
+    private string editListDescription = "";
+    
+
     protected override async Task OnInitializedAsync()
     {
         await UpdateListTable();
@@ -103,6 +115,7 @@ else
         Console.WriteLine("UPDATED NAVMENU");
 
     }
+
     public async void Submit()
     {
         Console.WriteLine($"Attempting to create TODO List {newToDoListTitle}");
@@ -113,6 +126,8 @@ else
 
         }
     }
+
+    
 
     private async Task UpdateListTable()
     {
@@ -132,6 +147,13 @@ else
         showDeleteModal = true;
     }
 
+    private void ShowEditListPrompt(QueryToDoListSummaryDto listDto)
+    {
+        selectedList = listDto;
+        editListTitle = $"Edit '{selectedList.ListTitle}'?";
+        showEditListModal = true;
+    }
+
     private void CancelDelete()
     {
         selectedList = null;
@@ -141,6 +163,29 @@ else
     private async void ConfirmDelete()
     {
         RemoveTodoList();
+    }
+
+    private void CancelEdit()
+    {
+        showEditListModal = false;
+    }
+
+    private async Task ConfirmEdit((string, string) values)
+    {
+        editListTitle = values.Item1;
+        editListDescription = values.Item2;
+        await EditToDoList(editListTitle, editListDescription);
+    }
+
+    private async Task EditToDoList(string _newListTitle, string _newDescription)
+    {
+        var updateToDoList = new UpdateToDoListDto
+        {
+            ListTitle = _newListTitle,
+            ListDescription = _newDescription
+        };
+        await ToDoListService.PutToDoListAsync(updateToDoList);
+        Console.WriteLine($"Succesfully Edited TODO List {_newListTitle}");
     }
 
     private async void RemoveTodoList()

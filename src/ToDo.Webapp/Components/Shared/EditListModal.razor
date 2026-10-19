@@ -1,0 +1,44 @@
+﻿<div class="modal @(IsVisible ? "show d-block" : "")" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button type="button" class="btn-close" @onclick="Cancel"></button>
+            </div>
+            <div class="modal-body">
+                <InputText class="todoField" id="todoListTitleField" placeholder="New list title" @bind-Value="newToDoListTitle" />
+                <InputText class="todoField" id="todoListDescriptionField" placeholder="Description (optional)" @bind-Value="newTodoListDescription" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" @onclick="Confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "Edit List";
+
+    [Parameter]
+    public EventCallback <(string, string)> OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+    public string newToDoListTitle = "";
+    public string newTodoListDescription = "";
+
+    private async Task Confirm()
+    {
+        await OnConfirm.InvokeAsync((newToDoListTitle, newTodoListDescription));
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}

@@ -12,6 +12,7 @@ builder.Services.AddSwaggerGen();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddHealthChecks();
 
 // open Package Manager Console
 // Add-Migration
@@ -51,6 +52,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
 
 app.Run();
 

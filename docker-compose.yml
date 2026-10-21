@@ -32,3 +32,27 @@ services:
     depends_on:
       todo.db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  
+  todo.webapp:
+    ports:
+      - "5038:8080"
+      #- "7235:8081"
+    pull_policy: build
+    image: ${DOCKER_REGISTRY-}todowebapp
+    build:
+      context: .
+      dockerfile: ./src/ToDo.Webapp/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ApiSettings__BaseUrl=http://todo.api:8080
+    depends_on:
+      todo.db:
+        condition: service_healthy
+      todo.api:
+        condition: service_healthy

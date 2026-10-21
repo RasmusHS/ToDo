@@ -34,14 +34,17 @@ public class ToDoItemService : IToDoItemService
     public async Task<OneOf<ToDoItemResponseDto, List<ErrorResponseDto>>> PostToDoItemAsync(CreateToDoItemDto dto)
     {
         var response = await _httpClient.PostAsJsonAsync("api/ToDoItem/postToDoItem", dto);
-        var result = await response.Content.ReadFromJsonAsync<OneOf<ToDoItemResponseDto, List<ErrorResponseDto>>>();
 
-        if (result.IsT0)
-            return result.AsT0;
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<ToDoItemResponseDto>() ?? new ToDoItemResponseDto();
+        else if (!response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>() ?? [];
         else
         {
-            result.AsT1.Add(new ErrorResponseDto("http.error", $"Request failed with status {(int)response.StatusCode}."));
-            return result.AsT1;
+            return new List<ErrorResponseDto>
+            {
+                new("http.error", $"Request failed with status {(int)response.StatusCode}.")
+            };
         }
     }
 
@@ -56,14 +59,17 @@ public class ToDoItemService : IToDoItemService
     public async Task<OneOf<ToDoItemResponseDto, List<ErrorResponseDto>>> PutToDoItemAsync(UpdateToDoItemDto dto)
     {
         var response = await _httpClient.PutAsJsonAsync("api/ToDoItem/putToDoItem", dto);
-        var result = await response.Content.ReadFromJsonAsync<OneOf<ToDoItemResponseDto, List<ErrorResponseDto>>>();
-        
-        if (result.IsT0)
-            return result.AsT0;
+
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<ToDoItemResponseDto>() ?? new ToDoItemResponseDto();
+        else if (!response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>() ?? [];
         else
         {
-            result.AsT1.Add(new ErrorResponseDto("http.error", $"Request failed with status {(int)response.StatusCode}."));
-            return result.AsT1;
+            return new List<ErrorResponseDto>
+            {
+                new("http.error", $"Request failed with status {(int)response.StatusCode}.")
+            };
         }
     }
 
@@ -77,16 +83,20 @@ public class ToDoItemService : IToDoItemService
     {
         throw new NotImplementedException("Backend for DeleteToDoItemAsync has not been implemented yet.");
         var response = await _httpClient.DeleteAsync($"api/ToDoItem/deleteToDoItem/{id}");
-        var result = await response.Content.ReadFromJsonAsync<OneOf<Success, List<ErrorResponseDto>>>();
+        //var result = await response.Content.ReadFromJsonAsync<OneOf<Success, List<ErrorResponseDto>>>();
 
-        if (result.IsT0)
-            return result.AsT0;
+        if (response.IsSuccessStatusCode)
+            return new Success();
         else if (response.StatusCode == HttpStatusCode.NotFound) // Handle 404 Not Found assuming the item is already deleted
-            return result.AsT0; // Return Success for 404 Not Found to indicate the item is already deleted
+            return new Success(); // Return Success for 404 Not Found to indicate the item is already deleted
+        else if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NotFound)
+            return await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>() ?? [];
         else
         {
-            result.AsT1.Add(new ErrorResponseDto("http.error", $"Request failed with status {(int)response.StatusCode}."));
-            return result.AsT1;
+            return new List<ErrorResponseDto>
+            {
+                new("http.error", $"Request failed with status {(int)response.StatusCode}.")
+            };
         }
     }
 }

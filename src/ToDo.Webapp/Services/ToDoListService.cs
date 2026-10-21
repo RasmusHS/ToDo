@@ -29,14 +29,18 @@ public class ToDoListService : IToDoListService
     public async Task<OneOf<ToDoListResponseDto, List<ErrorResponseDto>>> PostToDoListAsync(CreateToDoListDto dto)
     {
         var response = await _httpClient.PostAsJsonAsync("api/ToDoList/postToDoList", dto);
-        var result = await response.Content.ReadFromJsonAsync<OneOf<ToDoListResponseDto, List<ErrorResponseDto>>>();
+        //var result = await response.Content.ReadFromJsonAsync<OneOf<ToDoListResponseDto, List<ErrorResponseDto>>>();
 
-        if (result.IsT0)
-            return result.AsT0;
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<ToDoListResponseDto>() ?? new ToDoListResponseDto();
+        else if (!response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>() ?? [];
         else
         {
-            result.AsT1.Add(new ErrorResponseDto("http.error", $"Request failed with status {(int)response.StatusCode}."));
-            return result.AsT1;
+            return new List<ErrorResponseDto>
+            {
+                new("http.error", $"Request failed with status {(int)response.StatusCode}.") // Add a generic error response if the request fails for any other reason
+            };
         }
     }
 
@@ -47,14 +51,18 @@ public class ToDoListService : IToDoListService
     /// <returns>Returns either the ToDoList or a list of error responses</returns>
     public async Task<OneOf<QueryToDoListDto, List<ErrorResponseDto>>> GetToDoListAsync(Guid id)
     {
-        var response = await _httpClient.GetFromJsonAsync<OneOf<QueryToDoListDto, List<ErrorResponseDto>>>($"api/ToDoList/getToDoList/{id}");
+        var response = await _httpClient.GetAsync($"api/ToDoList/getToDoList/{id}");
 
-        if (response.IsT0)
-            return response;
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<QueryToDoListDto>() ?? new QueryToDoListDto();
+        else if (!response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>() ?? [];
         else
         {
-            response.AsT1.Add(new ErrorResponseDto("http.error", $"Request failed. Could not retrieve ToDoList with ID {id}."));
-            return response.AsT1;
+            return new List<ErrorResponseDto>
+            {
+                new("http.error", $"Request failed. Could not retrieve ToDoList with ID {id}.") // Add a generic error response if the request fails for any other reason
+            };
         }
     }
 
@@ -64,14 +72,18 @@ public class ToDoListService : IToDoListService
     /// <returns>Returns either a list of ToDoLists or a list of error responses</returns>
     public async Task<OneOf<List<QueryToDoListSummaryDto>, List<ErrorResponseDto>>> GetAllToDoListsAsync()
     {
-        var response = await _httpClient.GetFromJsonAsync<OneOf<List<QueryToDoListSummaryDto>, List<ErrorResponseDto>>>("api/ToDoList/getAllToDoLists");
+        var response = await _httpClient.GetAsync("api/ToDoList/getAllToDoLists");
 
-        if (response.IsT0)
-            return response.AsT0;
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<QueryToDoListSummaryDto>>() ?? [];
+        else if (!response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>() ?? [];
         else
         {
-            response.AsT1.Add(new ErrorResponseDto("http.error", "Request failed. Could not retrieve any ToDoLists."));
-            return response.AsT1;
+            return new List<ErrorResponseDto>
+            {
+                new("http.error", "Request failed. Could not retrieve any ToDoLists.") //  Add a generic error response if the request fails for any other reason
+            };
         }
     }
 
@@ -83,14 +95,17 @@ public class ToDoListService : IToDoListService
     public async Task<OneOf<ToDoListResponseDto, List<ErrorResponseDto>>> PutToDoListAsync(UpdateToDoListDto dto)
     {
         var response = await _httpClient.PutAsJsonAsync("api/ToDoList/putToDoList", dto);
-        var result = await response.Content.ReadFromJsonAsync<OneOf<ToDoListResponseDto, List<ErrorResponseDto>>>();
 
-        if (result.IsT0)
-            return result.AsT0;
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<ToDoListResponseDto>() ?? new ToDoListResponseDto();
+        else if (!response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>() ?? [];
         else
         {
-            result.AsT1.Add(new ErrorResponseDto("http.error", $"Request failed with status {(int)response.StatusCode}."));
-            return result.AsT1;
+            return new List<ErrorResponseDto>
+            {
+                new("http.error", $"Request failed with status {(int)response.StatusCode}.") // Add a generic error response if the request fails for any other reason
+            };
         }
     }
 
@@ -102,16 +117,19 @@ public class ToDoListService : IToDoListService
     public async Task<OneOf<Success, List<ErrorResponseDto>>> DeleteToDoListAsync(Guid id)
     {
         var response = await _httpClient.DeleteAsync($"api/ToDoList/deleteToDoList/{id}");
-        var result = await response.Content.ReadFromJsonAsync<OneOf<Success, List<ErrorResponseDto>>>();
 
-        if (result.IsT0 || response.StatusCode == HttpStatusCode.NoContent)
-            return result.AsT0;
+        if (response.IsSuccessStatusCode)
+            return new Success();
         else if (response.StatusCode == HttpStatusCode.NotFound)
-            return result.AsT0;
+            return new Success(); 
+        else if (!response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NotFound)
+            return await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>() ?? [];
         else 
         {
-            result.AsT1.Add(new ErrorResponseDto("http.error", $"Request failed with status {(int)response.StatusCode}."));
-            return result.AsT1;
+            return new List<ErrorResponseDto>
+            {
+                new("http.error", $"Request failed with status {(int)response.StatusCode}.") // Add a generic error response if the request fails for any other reason
+            };
         }
     }
 }

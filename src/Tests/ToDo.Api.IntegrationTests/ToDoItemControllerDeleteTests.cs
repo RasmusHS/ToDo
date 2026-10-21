@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Json;
 using Helpers;
@@ -8,6 +9,7 @@ using ToDo.Domain;
 
 namespace ToDo.Api.IntegrationTests;
 
+[ExcludeFromCodeCoverage]
 public class ToDoItemControllerDeleteTests : BaseIntegrationTest
 {
     private static string DeleteUrl(object id) => $"api/ToDoItem/deleteToDoItem/{id}";

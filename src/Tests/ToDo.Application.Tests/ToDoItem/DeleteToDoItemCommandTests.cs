@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
 using ToDo.Application.CQRS.Commands.ToDoItem.Handlers;
@@ -6,6 +7,7 @@ using ToDo.Persistence;
 
 namespace ToDo.Application.Tests.ToDoItem;
 
+[ExcludeFromCodeCoverage]
 public class DeleteToDoItemCommandTests : IDisposable
 {
     private readonly DbContextOptions<ToDoDbContext> _options;

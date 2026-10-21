@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,7 @@ namespace ToDo.Persistence.Tests;
 /// i.e. that seeding is opt-in and only "true" turns it on.
 /// </summary>
 [Collection(PostgresCollection.Name)]
-
+[ExcludeFromCodeCoverage]
 public sealed class AddPersistenceSeedingTests(PostgresFixture fixture) : IAsyncLifetime
 {
     public Task InitializeAsync() => fixture.ResetAsync();

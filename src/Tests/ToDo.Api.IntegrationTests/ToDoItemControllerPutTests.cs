@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Json;
 using Helpers;
@@ -8,6 +9,7 @@ using ToDo.Domain;
 
 namespace ToDo.Api.IntegrationTests;
 
+[ExcludeFromCodeCoverage]
 public class ToDoItemControllerPutTests : BaseIntegrationTest
 {
     private const string PutUrl = "api/ToDoItem/putToDoItem";

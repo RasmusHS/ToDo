@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using ToDo.Persistence;
 
 namespace ToDo.Application.Tests.ToDoItem;
 
+[ExcludeFromCodeCoverage]
 public class CreateToDoItemCommandTests : IDisposable
 {
     private const int TextLength = 50;

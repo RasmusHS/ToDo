@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using ToDo.Domain;
 using ToDo.Persistence.Seeding;
 
 namespace ToDo.Persistence.Tests;
 
+[ExcludeFromCodeCoverage]
 [Collection(PostgresCollection.Name)]
 public sealed class DevDataSeederTests(PostgresFixture fixture) : IAsyncLifetime
 {

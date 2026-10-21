@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ToDo.Persistence;
 
 namespace ToDo.Api.IntegrationTests;
 
+[ExcludeFromCodeCoverage]
 public abstract class BaseIntegrationTest : IClassFixture<ToDoWebApplicationFactory>, IDisposable
 {
     private readonly IServiceScope _scope;

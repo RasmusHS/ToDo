@@ -56,17 +56,16 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     private async Task<ToDoItemEntity> SeedItemAsync() => (await SeedItemsAsync()).Single();
 
     private static UpdateToDoItemDto UpdateDto(
-        Guid id, Guid listId, bool isDone = true, string? text = null, bool withStatus = true, string? status = null) => new()
+        Guid id, bool isDone = true, string? text = null, bool withStatus = true, string? status = null) => new()
         {
             Id = id,
-            ToDoListId = listId,
             IsDone = isDone,
             Text = text ?? StringRandom.GetRandomAlphabeticString(TextLength),
             Status = withStatus ? status ?? StringRandom.GetRandomAlphabeticString(StatusLength) : null
         };
 
     private static UpdateToDoItemDto UpdateDto(ToDoItemEntity item, bool isDone = true) =>
-        UpdateDto(item.Id, item.ToDoListId, isDone);
+        UpdateDto(item.Id, isDone);
 
     private async Task<List<ErrorResponseDto>> ReadErrorsAsync(HttpResponseMessage response) =>
         (await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>())!;
@@ -143,7 +142,7 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     {
         var item = await SeedItemAsync();
 
-        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(item.Id, item.ToDoListId, withStatus: false));
+        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(item.Id, withStatus: false));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Null((await Items.SingleAsync()).Status);
@@ -173,7 +172,7 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     public async Task PutToDoItem_TextAndStatusAtMaxLength_Returns200AndPersists()
     {
         var item = await SeedItemAsync();
-        var dto = UpdateDto(item.Id, item.ToDoListId,
+        var dto = UpdateDto(item.Id,
             text: StringRandom.GetRandomAlphabeticString(TextMaxLength),
             status: StringRandom.GetRandomAlphabeticString(StatusMaxLength));
 
@@ -194,7 +193,7 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
         var item = await SeedItemAsync();
         var missingId = Guid.NewGuid();
 
-        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(missingId, item.ToDoListId));
+        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(missingId));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var error = Assert.Single(await ReadErrorsAsync(response));
@@ -207,40 +206,9 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     {
         var item = await SeedItemAsync();
 
-        await _client.PutAsJsonAsync(PutUrl, UpdateDto(Guid.NewGuid(), item.ToDoListId));
+        await _client.PutAsJsonAsync(PutUrl, UpdateDto(Guid.NewGuid()));
 
         Assert.Equal(item.Id, (await Items.SingleAsync()).Id);
-    }
-
-    // ---List mismatch---
-
-    [Fact]
-    public async Task PutToDoItem_ItemFromOtherList_Returns400WithNotFoundInCollectionError()
-    {
-        var item = await SeedItemAsync();
-        var otherListItem = await SeedItemAsync(); // seeds a second list
-
-        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(item.Id, otherListItem.ToDoListId));
-
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        var error = Assert.Single(await ReadErrorsAsync(response));
-        Assert.Equal("entity.not.found.in.collection", error.ErrorCode);
-        Assert.Contains(item.Id.ToString(), error.ErrorMessage);
-    }
-
-    [Fact]
-    public async Task PutToDoItem_ItemFromOtherList_DoesNotPersist()
-    {
-        var item = await SeedItemAsync();
-        var otherListItem = await SeedItemAsync();
-
-        await _client.PutAsJsonAsync(PutUrl, UpdateDto(item.Id, otherListItem.ToDoListId));
-
-        var unchanged = await Items.SingleAsync(i => i.Id == item.Id);
-        Assert.Equal(item.ToDoListId, unchanged.ToDoListId);
-        Assert.Equal(item.Text, unchanged.Text);
-        Assert.Equal(item.IsDone, unchanged.IsDone);
-        Assert.Equal(item.ModifiedOn, unchanged.ModifiedOn);
     }
 
     // ---Validation---
@@ -251,7 +219,7 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     {
         var item = await SeedItemAsync();
 
-        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(Guid.Empty, item.ToDoListId));
+        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(Guid.Empty));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var error = Assert.Single(await ReadErrorsAsync(response));
@@ -260,23 +228,10 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     }
 
     [Fact]
-    public async Task PutToDoItem_EmptyListId_Returns400WithNotEmptyError()
-    {
-        var item = await SeedItemAsync();
-
-        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(item.Id, Guid.Empty));
-
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        var error = Assert.Single(await ReadErrorsAsync(response));
-        Assert.Equal("NotEmptyValidator", error.ErrorCode);
-        Assert.Equal("ToDoListId is required.", error.ErrorMessage);
-    }
-
-    [Fact]
     public async Task PutToDoItem_TextOverMaxLength_Returns400WithMaxLengthError()
     {
         var item = await SeedItemAsync();
-        var dto = UpdateDto(item.Id, item.ToDoListId, text: StringRandom.GetRandomAlphabeticString(TextMaxLength + 1));
+        var dto = UpdateDto(item.Id, text: StringRandom.GetRandomAlphabeticString(TextMaxLength + 1));
 
         var response = await _client.PutAsJsonAsync(PutUrl, dto);
 
@@ -290,7 +245,7 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     public async Task PutToDoItem_StatusOverMaxLength_Returns400WithMaxLengthError()
     {
         var item = await SeedItemAsync();
-        var dto = UpdateDto(item.Id, item.ToDoListId, status: StringRandom.GetRandomAlphabeticString(StatusMaxLength + 1));
+        var dto = UpdateDto(item.Id, status: StringRandom.GetRandomAlphabeticString(StatusMaxLength + 1));
 
         var response = await _client.PutAsJsonAsync(PutUrl, dto);
 
@@ -303,14 +258,14 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     [Fact]
     public async Task PutToDoItem_MultipleRuleViolations_ReturnsAllErrors()
     {
-        var dto = UpdateDto(Guid.Empty, Guid.Empty,
+        var dto = UpdateDto(Guid.Empty,
             text: StringRandom.GetRandomAlphabeticString(TextMaxLength + 1),
             status: StringRandom.GetRandomAlphabeticString(StatusMaxLength + 1));
 
         var response = await _client.PutAsJsonAsync(PutUrl, dto);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal(4, (await ReadErrorsAsync(response)).Count);
+        Assert.Equal(3, (await ReadErrorsAsync(response)).Count);
     }
 
     /// <summary>
@@ -322,7 +277,7 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
     {
         var item = await SeedItemAsync();
 
-        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(item.Id, item.ToDoListId, text: ""));
+        var response = await _client.PutAsJsonAsync(PutUrl, UpdateDto(item.Id, text: ""));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -333,11 +288,12 @@ public class ToDoItemControllerPutTests : BaseIntegrationTest
         var item = await SeedItemAsync();
 
         await _client.PutAsJsonAsync(PutUrl,
-            UpdateDto(item.Id, item.ToDoListId, text: StringRandom.GetRandomAlphabeticString(TextMaxLength + 1)));
+            UpdateDto(item.Id, text: StringRandom.GetRandomAlphabeticString(TextMaxLength + 1)));
 
         var unchanged = await Items.SingleAsync();
         Assert.Equal(item.Text, unchanged.Text);
         Assert.Equal(item.IsDone, unchanged.IsDone);
         Assert.Equal(item.ModifiedOn, unchanged.ModifiedOn);
     }
+
 }

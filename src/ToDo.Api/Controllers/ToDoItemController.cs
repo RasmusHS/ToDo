@@ -11,11 +11,13 @@ public class ToDoItemController : ControllerBase
 {
     private readonly ICreateToDoItemCommand _createToDoItem;
     private readonly IUpdateToDoItemCommand _updateToDoItem;
+    private readonly IDeleteToDoItemCommand _deleteToDoItem;
 
-    public ToDoItemController(ICreateToDoItemCommand createToDoItem, IUpdateToDoItemCommand updateToDoItem)
+    public ToDoItemController(ICreateToDoItemCommand createToDoItem, IUpdateToDoItemCommand updateToDoItem, IDeleteToDoItemCommand deleteToDoItem)
     {
         _createToDoItem = createToDoItem;
         _updateToDoItem = updateToDoItem;
+        _deleteToDoItem = deleteToDoItem;
     }
 
     [HttpPost]
@@ -80,4 +82,15 @@ public class ToDoItemController : ControllerBase
 
     }
 
+    [HttpDelete]
+    [Route("deleteToDoItem/{id}")]
+    public async Task<IActionResult> DeleteToDoItem(Guid id)
+    {
+        var commandResult = await _deleteToDoItem.DeleteAsync(id);
+
+        if (commandResult.IsT0)
+            return NoContent();
+        else
+            return NotFound(commandResult.AsT1);
+    }
 }

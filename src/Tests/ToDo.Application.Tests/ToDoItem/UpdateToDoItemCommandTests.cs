@@ -57,12 +57,11 @@ public class UpdateToDoItemCommandTests : IDisposable
     private ToDoItemEntity SeedItem() => SeedItems().Single();
 
     private static UpdateToDoItemDto CreateDto(ToDoItemEntity item, bool isDone = true, bool withStatus = true) =>
-        CreateDto(item.Id, item.ToDoListId, isDone, withStatus);
+        CreateDto(item.Id, isDone, withStatus);
 
-    private static UpdateToDoItemDto CreateDto(Guid id, Guid listId, bool isDone = true, bool withStatus = true) => new()
+    private static UpdateToDoItemDto CreateDto(Guid id, bool isDone = true, bool withStatus = true) => new()
     {
         Id = id,
-        ToDoListId = listId,
         IsDone = isDone,
         Text = RandomText(),
         Status = withStatus ? RandomStatus() : null
@@ -200,7 +199,7 @@ public class UpdateToDoItemCommandTests : IDisposable
         var item = SeedItem();
         var missingId = Guid.NewGuid();
 
-        var result = await _sut.UpdateAsync(CreateDto(missingId, item.ToDoListId));
+        var result = await _sut.UpdateAsync(CreateDto(missingId));
 
         Assert.True(result.IsT1);
         var error = Assert.Single(result.AsT1);
@@ -213,7 +212,7 @@ public class UpdateToDoItemCommandTests : IDisposable
     {
         var item = SeedItem();
 
-        await _sut.UpdateAsync(CreateDto(Guid.NewGuid(), item.ToDoListId));
+        await _sut.UpdateAsync(CreateDto(Guid.NewGuid()));
 
         _mapper.VerifyNoOtherCalls();
         using var assertContext = NewAssertContext();
@@ -230,45 +229,10 @@ public class UpdateToDoItemCommandTests : IDisposable
     {
         var item = SeedItem();
 
-        var result = await _sut.UpdateAsync(CreateDto(item.ToDoListId, item.ToDoListId));
+        var result = await _sut.UpdateAsync(CreateDto(item.ToDoListId));
 
         Assert.True(result.IsT1);
         Assert.Equal("entity.not.found", Assert.Single(result.AsT1).ErrorCode);
-    }
-
-    // ---List mismatch---
-
-    [Fact]
-    public async Task UpdateAsync_WrongListId_ReturnsNotFoundInCollectionError()
-    {
-        var item = SeedItem();
-
-        var result = await _sut.UpdateAsync(CreateDto(item.Id, Guid.NewGuid()));
-
-        Assert.True(result.IsT1);
-        var error = Assert.Single(result.AsT1);
-        Assert.Equal("entity.not.found.in.collection", error.ErrorCode);
-        Assert.Contains(item.Id.ToString(), error.ErrorMessage);
-    }
-
-    /// <summary>
-    /// The real case: the item exists, and so does the other list, but the item isn't in it.
-    /// </summary>
-    [Fact]
-    public async Task UpdateAsync_ItemFromOtherList_DoesNotPersistOrMap()
-    {
-        var item = SeedItem();
-        var otherListItem = SeedItem(); // seeds a second list
-
-        var result = await _sut.UpdateAsync(CreateDto(item.Id, otherListItem.ToDoListId));
-
-        Assert.True(result.IsT1);
-        _mapper.VerifyNoOtherCalls();
-        using var assertContext = NewAssertContext();
-        var unchanged = await assertContext.ToDoItems.SingleAsync(i => i.Id == item.Id);
-        Assert.Equal(item.ToDoListId, unchanged.ToDoListId);
-        Assert.Equal(item.Text, unchanged.Text);
-        Assert.Equal(item.ModifiedOn, unchanged.ModifiedOn);
     }
 
     // ---Exceptions---
@@ -282,6 +246,4 @@ public class UpdateToDoItemCommandTests : IDisposable
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.UpdateAsync(CreateDto(item)));
     }
-
-
 }

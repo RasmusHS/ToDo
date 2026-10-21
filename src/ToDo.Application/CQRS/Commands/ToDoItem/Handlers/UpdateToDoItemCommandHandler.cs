@@ -29,12 +29,6 @@ public class UpdateToDoItemCommandHandler : IUpdateToDoItemCommand
             return errors;
         }
 
-        if (result.ToDoListId != dto.ToDoListId)
-        {
-            errors.Add(ToDoItemErrors.NotFoundInCollection<UpdateToDoItemDto>(dto.Id));
-            return errors;
-        }
-
         result.Update(dto.IsDone, dto.Text, dto.Status);
 
         _dbContext.ToDoItems.Update(result);

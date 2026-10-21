@@ -5,11 +5,6 @@ public class UpdateToDoItemDto
     /// </summary>
     public Guid Id { get; set; }
 
-    // <summary>
-    /// FK identifier for which ToDoListEntity that this ToDoItemEntity belongs to.
-    /// </summary>
-    public Guid ToDoListId { get; set; }
-
     /// <summary>
     /// Indicates whether this ToDoItemEntity is done.
     /// Default is set to false in the ctor
@@ -27,17 +22,4 @@ public class UpdateToDoItemDto
     /// Shortterm the values will be taken from a list here in the domain, but a better solution would be a json file.  
     /// </summary>
     public string? Status { get; set; }
-
-    /// <summary>
-    /// The date and time on which a ToDoItemEntity was created. 
-    /// Only set at creation and then never touched again.
-    /// </summary>
-    public DateTime CreatedOn { get; set; }
-
-    /// <summary>
-    /// The date and time on which a ToDoItemEntity was last updated.
-    /// Only set in ctor and Update methods.
-    /// </summary>
-    public DateTime ModifiedOn { get; set; }
-
 }

@@ -27,6 +27,7 @@ public static class DependencyInjection
         // ToDoItem
         services.AddScoped<ICreateToDoItemCommand, CreateToDoItemCommandHandler>();
         services.AddScoped<IUpdateToDoItemCommand, UpdateToDoItemCommandHandler>();
+        services.AddScoped<IDeleteToDoItemCommand, DeleteToDoItemCommandHandler>();
 
         return services;
     }

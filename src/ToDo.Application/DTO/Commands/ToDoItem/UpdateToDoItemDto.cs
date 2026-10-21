@@ -9,11 +9,6 @@ public class UpdateToDoItemDto
     /// </summary>
     public Guid Id { get; set; }
 
-    // <summary>
-    /// FK identifier for which ToDoListEntity that this ToDoItemEntity belongs to.
-    /// </summary>
-    public Guid ToDoListId { get; set; }
-
     /// <summary>
     /// Indicates whether this ToDoItemEntity is done.
     /// Default is set to false in the ctor
@@ -32,24 +27,11 @@ public class UpdateToDoItemDto
     /// </summary>
     public string? Status { get; set; }
 
-    /// <summary>
-    /// The date and time on which a ToDoItemEntity was created. 
-    /// Only set at creation and then never touched again.
-    /// </summary>
-    public DateTime CreatedOn { get; set; }
-
-    /// <summary>
-    /// The date and time on which a ToDoItemEntity was last updated.
-    /// Only set in ctor and Update methods.
-    /// </summary>
-    public DateTime ModifiedOn { get; set; }
-
     public class Validator : AbstractValidator<UpdateToDoItemDto>
     {
         public Validator()
         {
             RuleFor(x => x.Id).NotEmpty().WithMessage("Id is required.");
-            RuleFor(x => x.ToDoListId).NotEmpty().WithMessage("ToDoListId is required.");
             RuleFor(x => x.Text)
                 .NotEmpty().WithMessage("Text is required.")
                 .MaximumLength(500).WithMessage("Text cannot exceed 500 characters.");

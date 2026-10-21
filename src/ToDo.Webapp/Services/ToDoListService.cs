@@ -29,7 +29,6 @@ public class ToDoListService : IToDoListService
     public async Task<OneOf<ToDoListResponseDto, List<ErrorResponseDto>>> PostToDoListAsync(CreateToDoListDto dto)
     {
         var response = await _httpClient.PostAsJsonAsync("api/ToDoList/postToDoList", dto);
-        //var result = await response.Content.ReadFromJsonAsync<OneOf<ToDoListResponseDto, List<ErrorResponseDto>>>();
 
         if (response.IsSuccessStatusCode)
             return await response.Content.ReadFromJsonAsync<ToDoListResponseDto>() ?? new ToDoListResponseDto();

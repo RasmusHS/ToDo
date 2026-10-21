@@ -81,9 +81,7 @@ public class ToDoItemService : IToDoItemService
     /// <exception cref="NotImplementedException"></exception>
     public async Task<OneOf<Success, List<ErrorResponseDto>>> DeleteToDoItemAsync(Guid id)
     {
-        throw new NotImplementedException("Backend for DeleteToDoItemAsync has not been implemented yet.");
         var response = await _httpClient.DeleteAsync($"api/ToDoItem/deleteToDoItem/{id}");
-        //var result = await response.Content.ReadFromJsonAsync<OneOf<Success, List<ErrorResponseDto>>>();
 
         if (response.IsSuccessStatusCode)
             return new Success();

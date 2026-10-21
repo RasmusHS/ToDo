@@ -94,7 +94,7 @@ else
     private bool showEditListModal = false;
     private string editListTitle = "";
     private string editListDescription = "";
-    
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -128,12 +128,10 @@ else
         }
     }
 
-    
-
     private async Task UpdateListTable()
     {
         var result = await ToDoListService.GetAllToDoListsAsync();
-        
+
         if (result.IsT0)
         {
             queryDto = result.AsT0;
@@ -174,7 +172,13 @@ else
 
     private async void ConfirmDelete()
     {
-        RemoveTodoList();
+        showDeleteModal = false;
+        if (selectedList is not null)
+        {
+            await RemoveTodoList(selectedList.Id);
+            await UpdateListTable();
+            await UpdateNavMenuAsync();
+        }
     }
 
     private void CancelEdit()
@@ -187,24 +191,33 @@ else
         editListTitle = values.Item1;
         editListDescription = values.Item2;
         await EditToDoList(editListTitle, editListDescription);
+        await UpdateListTable();
+        await UpdateNavMenuAsync();
+        showEditListModal = false;
     }
 
     private async Task EditToDoList(string _newListTitle, string _newDescription)
     {
-        var updateToDoList = new UpdateToDoListDto
+        if (selectedList is not null)
         {
-            Id = selectedList.Id,
-            ListTitle = _newListTitle,
-            ListDescription = _newDescription
-        };
-        await ToDoListService.PutToDoListAsync(updateToDoList);
-        Console.WriteLine($"Succesfully Edited TODO List {_newListTitle}");
+            var updateToDoList = new UpdateToDoListDto
+            {
+                Id = selectedList.Id,
+                ListTitle = _newListTitle,
+                ListDescription = _newDescription
+            };
+            await ToDoListService.PutToDoListAsync(updateToDoList);
+            Console.WriteLine($"Succesfully Edited TODO List {_newListTitle}");
+        }
+        else
+        {
+            Console.WriteLine("selected list is null");
+        }
+
     }
 
-    private async void RemoveTodoList()
+    private async Task RemoveTodoList(Guid id)
     {
-        @* TODO - Implement this method *@
-        
-        Console.WriteLine("Deleting lists not implemented yet");
+        await ToDoListService.DeleteToDoListAsync(id);
     }
 }

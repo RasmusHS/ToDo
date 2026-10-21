@@ -32,6 +32,7 @@
             <th>To-Do</th>
             <th>Created On</th>
             <th>Modified On</th>
+            <th>Edit</th>
             <th>Delete</th>
         </tr>
     </thead>
@@ -42,11 +43,17 @@
                 <td>@todoItem.Text</td>
                 <td>@todoItem.CreatedOn</td>
                 <td>@todoItem.ModifiedOn</td>
-                <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="() => RemoveTodoItem(todoItem)">Delete</button></td> 
+                <td> <button class="todoButton" id="todoItemEditButton" @onclick="() => ShowEditItemPrompt(todoItem)">Edit</button></td> 
+                <td> <button class="todoButton" id="todoItemDeleteButton" @onclick="() => RemoveToDoItem(todoItem.Id)">Delete</button></td> 
             </tr>
         }
     </tbody>
 </table>
+
+<EditItemModal     IsVisible="showEditItemModal"
+                   Title="@editItemText"
+                   OnConfirm="ConfirmEdit"
+                   OnCancel="CancelEdit" />
 
 @code {
     private CreateToDoItemDto createDto = new();
@@ -56,13 +63,19 @@
     
     public required string newToDoItemText {get; set;}
 
+    // Modal vars
+    private QueryToDoItemDto? selectedItem;
+
+    private bool showEditItemModal = false;
+    private string editItemText = "";
+
     [Parameter]
     public Guid listId { get; set; }
     protected override async Task OnInitializedAsync()
     {
         //NavigationManager.OnNotFound += HandleNotFound;
 
-        await updateItemTable();
+        await UpdateItemTable();
 
         if (queryDto == null)
         {
@@ -79,7 +92,7 @@
         };
         await ToDoItemService.PostToDoItemAsync(newToDoItem);
         Console.WriteLine($"Succesfully ADDED TODO Item {text}");
-        await updateItemTable();
+        await UpdateItemTable();
     }
     public async void Submit()
     {
@@ -91,9 +104,31 @@
         }
         newToDoItemText = "";
     }
-
-    private async Task updateItemTable()
+    private void ShowEditItemPrompt(QueryToDoItemDto itemDto)
     {
+        selectedItem = itemDto;
+        editItemText = $"Edit '{selectedItem.Text}'?";
+        showEditItemModal = true;
+    }
+
+    private void CancelEdit()
+    {
+        showEditItemModal = false;
+    }
+
+    private async Task ConfirmEdit(string newText)
+    {
+        Console.WriteLine("Confirm Edit");
+        editItemText = newText;
+        await EditToDoItem(editItemText);
+        await UpdateItemTable();
+        showEditItemModal = false;
+        Console.WriteLine("Confirm Edit Finished");
+    }
+
+    private async Task UpdateItemTable()
+    {
+        Console.WriteLine("Update Item Table");
         var result = await ToDoListService.GetToDoListAsync(listId);
         
         if (result.IsT0)
@@ -109,10 +144,25 @@
         StateHasChanged();
     }
 
-    private async void RemoveTodoItem(QueryToDoItemDto itemDto)
+    private async void RemoveToDoItem(Guid id)
     {
-        @* TODO - Implement this method *@
-        Console.WriteLine("Deleting todoItems not implemented yet");
+        await ToDoItemService.DeleteToDoItemAsync(id);
+        await UpdateItemTable();
+    }
+
+    private async Task EditToDoItem(string text)
+    {
+        if (selectedItem is not null)
+        {
+            Console.WriteLine("UpdateToDoItemDto");
+            var updateToDoItem = new UpdateToDoItemDto
+            {
+                Id = selectedItem.Id,
+                Text = text,
+            };
+            await ToDoItemService.PutToDoItemAsync(updateToDoItem);
+            Console.WriteLine("UpdateToDoItemDto Finished");
+        }
     }
 
 }

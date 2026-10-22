@@ -25,6 +25,11 @@
     </div>
 </form>
 
+@if (errorMessage is not null)
+{
+    
+}
+
 @if (queryDto.Count <= 0)
 {
     <p><em>Add a list to begin</em></p>
@@ -95,6 +100,8 @@ else
     private string editListTitle = "";
     private string editListDescription = "";
 
+    private string? errorMessage;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,22 +116,15 @@ else
             ListDescription = _newDescription
         };
         await ToDoListService.PostToDoListAsync(newToDoList);
-        Console.WriteLine($"Succesfully ADDED TODO List {_newListTitle}");
         await UpdateListTable();
-
         await UpdateNavMenuAsync();
-        Console.WriteLine("UPDATED NAVMENU");
-
     }
 
     public async void Submit()
     {
-        Console.WriteLine($"Attempting to create TODO List {newToDoListTitle}");
         if (!string.IsNullOrWhiteSpace(newToDoListTitle))
         {
             AddToDoList(newToDoListTitle, newTodoListDescription);
-            Console.WriteLine($"Succesfully CREATED TODO List {newToDoListTitle}");
-
         }
     }
 
@@ -207,13 +207,11 @@ else
                 ListDescription = _newDescription
             };
             await ToDoListService.PutToDoListAsync(updateToDoList);
-            Console.WriteLine($"Succesfully Edited TODO List {_newListTitle}");
         }
         else
         {
             Console.WriteLine("selected list is null");
         }
-
     }
 
     private async Task RemoveTodoList(Guid id)

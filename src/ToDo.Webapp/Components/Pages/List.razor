@@ -80,7 +80,6 @@
         if (queryDto == null)
         {
             //NavigationManager.NotFound();
-            Console.WriteLine($"List not found with Id {listId}");
         }
     }
     private async void AddToDoItem(string text, string? status)
@@ -91,16 +90,13 @@
             Text = text
         };
         await ToDoItemService.PostToDoItemAsync(newToDoItem);
-        Console.WriteLine($"Succesfully ADDED TODO Item {text}");
         await UpdateItemTable();
     }
     public async void Submit()
     {
-        Console.WriteLine($"Attempting to create TODO Item {newToDoItemText}");
         if (!string.IsNullOrWhiteSpace(newToDoItemText))
         {
             AddToDoItem(newToDoItemText, null); // TODO: Null for now until status field has been added
-            Console.WriteLine($"Succesfully CREATED TODO Item {newToDoItemText}");
         }
         newToDoItemText = "";
     }
@@ -118,17 +114,14 @@
 
     private async Task ConfirmEdit(string newText)
     {
-        Console.WriteLine("Confirm Edit");
         editItemText = newText;
         await EditToDoItem(editItemText);
         await UpdateItemTable();
         showEditItemModal = false;
-        Console.WriteLine("Confirm Edit Finished");
     }
 
     private async Task UpdateItemTable()
     {
-        Console.WriteLine("Update Item Table");
         var result = await ToDoListService.GetToDoListAsync(listId);
         
         if (result.IsT0)
@@ -154,14 +147,12 @@
     {
         if (selectedItem is not null)
         {
-            Console.WriteLine("UpdateToDoItemDto");
             var updateToDoItem = new UpdateToDoItemDto
             {
                 Id = selectedItem.Id,
                 Text = text,
             };
             await ToDoItemService.PutToDoItemAsync(updateToDoItem);
-            Console.WriteLine("UpdateToDoItemDto Finished");
         }
     }
 

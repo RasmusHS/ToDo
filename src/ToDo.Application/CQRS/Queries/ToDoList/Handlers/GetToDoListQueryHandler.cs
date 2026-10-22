@@ -29,24 +29,16 @@ public class GetToDoListQueryHandler : IGetToDoListQuery
     {
         List<ErrorResponseDto> errors = new List<ErrorResponseDto>();
 
-        try
-        {
-            var result = await _dbContext.ToDoLists
+        var result = await _dbContext.ToDoLists
                 .AsNoTracking()
                 .Include(tdl => tdl.ToDoItems)
                 .FirstOrDefaultAsync(x => x.Id == id);
-            if (result == null)
-            {
-                errors.Add(ToDoListErrors.NotFound<QueryToDoListDto>(id));
-                return errors;
-            }
-
-            return _mapper.Map<QueryToDoListDto>(result);
-        }
-        catch (Exception)
+        if (result == null)
         {
-            errors.Add(ToDoListErrors.InvalidData<QueryToDoListDto>());
+            errors.Add(ToDoListErrors.NotFound<QueryToDoListDto>(id));
             return errors;
         }
+
+        return _mapper.Map<QueryToDoListDto>(result);
     }
 }

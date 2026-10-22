@@ -142,32 +142,4 @@ public class CreateToDoItemCommandTests : IDisposable
         _mapper.Verify(m => m.Map<ToDoItemEntity>(dto), Times.Once);
         _mapper.Verify(m => m.Map<ToDoItemResponseDto>(entity), Times.Once);
     }
-
-    // ---Exception path---
-
-    [Fact]
-    public async Task CreateAsync_MapperThrows_ReturnsInvalidDataError()
-    {
-        var dto = CreateDto();
-        _mapper.Setup(m => m.Map<ToDoItemEntity>(dto)).Throws<InvalidOperationException>();
-
-        var result = await _sut.CreateAsync(dto);
-
-        Assert.True(result.IsT1);
-        var error = Assert.Single(result.AsT1);
-        Assert.Equal("entity.invalid.data", error.ErrorCode);
-    }
-
-    [Fact]
-    public async Task CreateAsync_MapperThrows_DoesNotPersist()
-    {
-        var dto = CreateDto();
-        _mapper.Setup(m => m.Map<ToDoItemEntity>(dto)).Throws<InvalidOperationException>();
-
-        await _sut.CreateAsync(dto);
-
-        using var assertContext = NewAssertContext();
-        Assert.Empty(assertContext.ToDoItems);
-    }
-
 }

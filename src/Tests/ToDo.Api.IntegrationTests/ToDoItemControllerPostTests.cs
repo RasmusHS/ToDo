@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http.Json;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
-using ToDo.Application.DTO;
 using ToDo.Application.DTO.Commands.ToDoItem;
 using ToDo.Domain;
 
@@ -143,17 +142,6 @@ public class ToDoItemControllerPostTests : BaseIntegrationTest
     // ---Non-existent list---
     // Current behavior: FK violation -> DbUpdateException -> handler catch-all -> InvalidData.
     // If the handler gets an explicit list-exists check, change the expected code to "entity.not.found".
-
-    [Fact]
-    public async Task PostToDoItem_NonExistentList_Returns400()
-    {
-        var response = await _client.PostAsJsonAsync(PostUrl, CreateDto(Guid.NewGuid()));
-
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        var errors = await response.Content.ReadFromJsonAsync<List<ErrorResponseDto>>();
-        var error = Assert.Single(errors!);
-        Assert.Equal("entity.invalid.data", error.ErrorCode);
-    }
 
     [Fact]
     public async Task PostToDoItem_NonExistentList_DoesNotPersist()

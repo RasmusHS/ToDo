@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Helpers;
 
 namespace ToDo.Domain.Tests;
 
+[ExcludeFromCodeCoverage]
 public class ToDoListEntityTests
 {
     // Arbitrary until the group settles on max lengths; swap for the real constants then.

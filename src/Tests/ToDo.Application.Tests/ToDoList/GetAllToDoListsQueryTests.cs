@@ -1,11 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using ToDo.Application.CQRS.Queries.ToDoList.Handlers;
-using ToDo.Application.DTO.Queries;
 using ToDo.Application.Errors;
 using ToDo.Application.Profiles;
 using ToDo.Domain;
@@ -13,6 +11,7 @@ using ToDo.Persistence;
 
 namespace ToDo.Application.Tests.ToDoList;
 
+[ExcludeFromCodeCoverage]
 public class GetAllToDoListsQueryTests : IDisposable
 {
     private readonly DbContextOptions<ToDoDbContext> _options;

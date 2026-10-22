@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Helpers;
 
+[ExcludeFromCodeCoverage]
 public static class StringRandom
 {
     public static string GetRandomString(int length)

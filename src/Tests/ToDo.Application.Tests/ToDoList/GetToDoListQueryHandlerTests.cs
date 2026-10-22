@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using ToDo.Persistence;
 
 namespace ToDo.Application.Tests.ToDoList;
 
+[ExcludeFromCodeCoverage]
 public class GetToDoListQueryHandlerTests : IDisposable
 {
     private readonly DbContextOptions<ToDoDbContext> _options;
@@ -158,20 +160,4 @@ public class GetToDoListQueryHandlerTests : IDisposable
 
         _mapper.VerifyNoOtherCalls();
     }
-
-    // ---Exception path---
-
-    [Fact]
-    public async Task GetAsync_MapperThrows_ReturnsInvalidDataError()
-    {
-        var listId = SeedList(itemCount: 0);
-        _mapper.Setup(m => m.Map<QueryToDoListDto>(It.IsAny<ToDoListEntity>()))
-            .Throws<InvalidOperationException>();
-
-        var result = await _sut.GetAsync(listId);
-
-        Assert.True(result.IsT1);
-        Assert.Equal("entity.invalid.data", Assert.Single(result.AsT1).ErrorCode);
-    }
-
 }

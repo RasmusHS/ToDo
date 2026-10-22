@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using ToDo.Domain;
 
 namespace ToDo.Persistence.Tests;
 
+[ExcludeFromCodeCoverage]
 public class PostgresFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:18")

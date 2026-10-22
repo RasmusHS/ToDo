@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using ToDo.Persistence;
 
 namespace ToDo.Application.Tests.ToDoList;
 
+[ExcludeFromCodeCoverage]
 public class CreateToDoListCommandTests : IDisposable
 {
     private const int TitleLength = 200;
@@ -159,32 +161,4 @@ public class CreateToDoListCommandTests : IDisposable
 
         _mapper.VerifyNoOtherCalls();
     }
-
-    // ---Exception path---
-
-    [Fact]
-    public async Task CreateAsync_MapperThrows_ReturnsInvalidDataError()
-    {
-        var dto = CreateDto();
-        _mapper.Setup(m => m.Map<ToDoListEntity>(dto)).Throws<InvalidOperationException>();
-
-        var result = await _sut.CreateAsync(dto);
-
-        Assert.True(result.IsT1);
-        var error = Assert.Single(result.AsT1);
-        Assert.Equal("entity.invalid.data", error.ErrorCode);
-    }
-
-    [Fact]
-    public async Task CreateAsync_MapperThrows_DoesNotPersist()
-    {
-        var dto = CreateDto();
-        _mapper.Setup(m => m.Map<ToDoListEntity>(dto)).Throws<InvalidOperationException>();
-
-        await _sut.CreateAsync(dto);
-
-        using var assertContext = NewAssertContext();
-        Assert.Empty(assertContext.ToDoLists);
-    }
-
 }

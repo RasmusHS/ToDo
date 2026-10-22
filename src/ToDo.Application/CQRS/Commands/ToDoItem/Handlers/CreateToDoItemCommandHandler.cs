@@ -2,7 +2,6 @@ using AutoMapper;
 using OneOf;
 using ToDo.Application.DTO;
 using ToDo.Application.DTO.Commands.ToDoItem;
-using ToDo.Application.Errors;
 using ToDo.Domain;
 using ToDo.Persistence;
 
@@ -23,19 +22,11 @@ public class CreateToDoItemCommandHandler : ICreateToDoItemCommand
     {
         List<ErrorResponseDto> errors = new List<ErrorResponseDto>(); // Initialize an empty list to hold error responses
 
-        try
-        {
-            var toDoItem = _mapper.Map<ToDoItemEntity>(dto);
+        var toDoItem = _mapper.Map<ToDoItemEntity>(dto);
 
-            await _dbContext.ToDoItems.AddAsync(toDoItem);
-            await _dbContext.SaveChangesAsync();
+        await _dbContext.ToDoItems.AddAsync(toDoItem);
+        await _dbContext.SaveChangesAsync();
 
-            return _mapper.Map<ToDoItemResponseDto>(toDoItem);
-        }
-        catch (Exception)
-        {
-            errors.Add(ToDoItemErrors.InvalidData<CreateToDoItemDto>());
-            return errors;
-        }
+        return _mapper.Map<ToDoItemResponseDto>(toDoItem);
     }
 }

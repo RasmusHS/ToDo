@@ -23,26 +23,17 @@ public class CreateToDoListCommandHandler : ICreateToDoListCommand
     {
         List<ErrorResponseDto> errors = new List<ErrorResponseDto>(); // Initialize an empty list to hold error responses
 
-        try
+        if (_dbContext.ToDoLists.Any(t => t.ListTitle == dto.ListTitle))
         {
-            if (_dbContext.ToDoLists.Any(t => t.ListTitle == dto.ListTitle))
-            {
-                errors.Add(ToDoListErrors.AlreadyExists<CreateToDoListDto>(dto.ListTitle));
-                return errors; // Return the list of errors if a ToDoList with the same title already exists
-            }   
-
-            var toDoListEntity = _mapper.Map<ToDoListEntity>(dto);
-
-            await _dbContext.ToDoLists.AddAsync(toDoListEntity);
-            await _dbContext.SaveChangesAsync();
-
-            return _mapper.Map<ToDoListResponseDto>(toDoListEntity);
+            errors.Add(ToDoListErrors.AlreadyExists<CreateToDoListDto>(dto.ListTitle));
+            return errors; // Return the list of errors if a ToDoList with the same title already exists
         }
-        catch (Exception) 
-        {
-            // Return an error response DTO with the exception message
-            errors.Add(ToDoListErrors.InvalidData<CreateToDoListDto>());
-            return errors;
-        }
+
+        var toDoListEntity = _mapper.Map<ToDoListEntity>(dto);
+
+        await _dbContext.ToDoLists.AddAsync(toDoListEntity);
+        await _dbContext.SaveChangesAsync();
+
+        return _mapper.Map<ToDoListResponseDto>(toDoListEntity);
     }
 }

@@ -1,10 +1,14 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path=".github/workflows/coverage.yml" />
     <File Path=".github/workflows/main.yml" />
     <File Path=".gitignore" />
     <File Path=".runsettings" />
     <File Path="docker-compose.yml" />
+    <File Path="EERD_V1.png" />
+    <File Path="ERD_V3.png" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ToDo.Api/ToDo.Api.csproj" Id="7966230d-d785-4184-8095-a171c104dce0" />

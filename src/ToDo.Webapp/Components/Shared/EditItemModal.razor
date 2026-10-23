@@ -7,6 +7,11 @@
             </div>
             <div class="modal-body">
                 <InputText class="todoField" id="todoItemTitleField" placeholder="New item title" @bind-Value="newToDoItemText" />
+                <select @bind=newToDoItemStatus>
+                    <option value="empty"></option>
+                    <option value="inProgress">In Progress</option>
+                    <option value="done">Done</option>
+                </select>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
@@ -24,15 +29,32 @@
     public string Title { get; set; } = "Edit Item";
 
     [Parameter]
-    public EventCallback <string> OnConfirm { get; set; }
+    public EventCallback <(string, string?)> OnConfirm { get; set; }
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
     public string newToDoItemText = "";
+    public string? newToDoItemStatus = "";
+
+    private string MapToStatusText(string value)
+    {
+        switch (value)
+        {
+            case "empty":
+                return "";
+            case "inProgress":
+                return "In Progress";
+            case "done":
+                return "Done";
+            default:
+                return "";
+        }
+    }
 
     private async Task Confirm()
     {
-        await OnConfirm.InvokeAsync(newToDoItemText);
+        Console.WriteLine($"Status selected {newToDoItemStatus}");
+        await OnConfirm.InvokeAsync((newToDoItemText, MapToStatusText(newToDoItemStatus)));
     }
 
     private async Task Cancel()

@@ -42,3 +42,7 @@ The main purpose of this project is to learn to work together as a group, hence 
 ### Enhanced Entity Relation Diagram
 
 ![V1](EERD_V1.png)
+
+### Dependency Diagram
+
+![V1](DependencyDiagram.png)

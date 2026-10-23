@@ -1,0 +1,52 @@
+name: Coverage
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/**'
+      - '!.github/workflows/coverage.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Test with coverage
+        run: >
+          dotnet test
+          --settings .runsettings
+          --collect "Code Coverage;Format=cobertura"
+          --results-directory ./coverage
+
+      - name: Generate badge
+        uses: danielpalme/ReportGenerator-GitHub-Action@v5
+        with:
+          reports: coverage/**/*.cobertura.xml
+          targetdir: coveragereport
+          reporttypes: Badges;MarkdownSummaryGithub
+
+      - name: Job summary
+        run: cat coveragereport/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish badge to 'badges' branch
+        run: |
+          cp coveragereport/badge_linecoverage.svg /tmp/coverage.svg
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan badges
+          git rm -rf . --quiet
+          cp /tmp/coverage.svg coverage.svg
+          git add coverage.svg
+          git commit -m "Update coverage badge"
+          git push -f origin badges
